@@ -1,0 +1,135 @@
+<!doctype html>
+<html><head>
+    <meta charset="utf-8">
+    <title>Scoops' Clock Detection Utility</title>
+</head><body>
+	<div>
+		<img src=Bell.png width=40 style="display: inline" />
+		<h1 style="display: inline">Scoops' Clock<br>Detection Utility</h1>
+	</div>
+This will detect any Scoops' Clock on your subnet...<br>
+<br>
+<div<b>Subnets:</b></div>
+<div id=list></div>
+<br>
+<button onclick="startDetection()">Start Detection</button>
+<br>
+<br>
+<pre><div id=clockList></div></pre>
+<div id=clockNone></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+
+// NOTE: window.RTCPeerConnection is "not a constructor" in FF22/23
+var RTCPeerConnection = /*window.RTCPeerConnection ||*/ window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
+var addrs = Object.create(null);
+
+if (RTCPeerConnection) (function () {
+    var rtc = new RTCPeerConnection({iceServers:[]});
+    if (1 || window.mozRTCPeerConnection) {      // FF [and now Chrome!] needs a channel/stream to proceed
+        rtc.createDataChannel('', {reliable:false});
+    };
+    
+    rtc.onicecandidate = function (evt) {
+        // convert the candidate to SDP so we can run it through our general parser
+        // see https://twitter.com/lancestout/status/525796175425720320 for details
+        if (evt.candidate) grepSDP("a="+evt.candidate.candidate);
+    };
+    rtc.createOffer(function (offerDesc) {
+        grepSDP(offerDesc.sdp);
+        rtc.setLocalDescription(offerDesc);
+    }, function (e) { console.warn("offer failed", e); });
+    
+    
+    addrs["0.0.0."] = false;
+    function updateDisplay(newAddr) {
+		// keep only ipv4
+		var parts = newAddr.split('.');
+		if (parts.length==4) {
+			var baseIP = parts[0]+'.'+parts[1]+'.'+parts[2]+'.';
+			if (baseIP in addrs) return;
+			addrs[baseIP] = true;
+		}
+        var displayAddrs = Object.keys(addrs).filter(function (k) { return addrs[k]; });
+		var x = displayAddrs.length;
+		for (var i=0; i<x; i++)
+			makeSubNetDisp(displayAddrs[i]+"X");
+		//	displayAddrs[i] = displayAddrs[i]+"X";
+        //document.getElementById('list').textContent = "Subnets<br>" + displayAddrs.join("<br>") || "n/a";
+    }
+	
+	function makeSubNetDisp(n) {
+		var txt = document.createElement("span");
+		txt.textContent = n;
+		var br = document.createElement("br");
+		document.getElementById('list').appendChild(txt);
+		document.getElementById('list').appendChild(br);
+	}
+    
+    function grepSDP(sdp) {
+        var hosts = [];
+        sdp.split('\r\n').forEach(function (line) { // c.f. http://tools.ietf.org/html/rfc4566#page-39
+            if (~line.indexOf("a=candidate")) {     // http://tools.ietf.org/html/rfc4566#section-5.13
+                var parts = line.split(' '),        // http://tools.ietf.org/html/rfc5245#section-15.1
+                    addr = parts[4],
+                    type = parts[7];
+                if (type === 'host') updateDisplay(addr);
+            } else if (~line.indexOf("c=")) {       // http://tools.ietf.org/html/rfc4566#section-5.7
+                var parts = line.split(' '),
+                    addr = parts[2];
+                updateDisplay(addr);
+            }
+        });
+    }
+	
+	
+})(); else {
+    document.getElementById('list').innerHTML = "<code>ifconfig | grep inet | grep -v inet6 | cut -d\" \" -f2 | tail -n1</code>";
+    document.getElementById('list').nextSibling.textContent = "In Chrome and Firefox your IP should display automatically, by the power of WebRTCskull.";
+}
+
+	function startDetection() {
+		var myNode = document.getElementById('clockList');
+		while (myNode.firstChild)
+			myNode.removeChild(myNode.firstChild);
+		
+		document.getElementById('clockNone').textContent = "None Found";
+        var displayAddrs = Object.keys(addrs).filter(function (k) { return addrs[k]; });
+		var x = displayAddrs.length;
+		for (var i=0; i<x; i++) {
+			var baseIP = displayAddrs[i];
+			for (var e=0; e<256; e++)
+				testIP(baseIP+e)
+		}
+	}
+
+	function makeClockLink(name, addr) {
+		var a = document.createElement('a');
+		var linkText = document.createTextNode("http://"+addr);
+		a.appendChild(linkText);
+		a.title = name;
+		a.href = "http://"+addr;
+		var txt = document.createElement("span");
+		txt.textContent = name+" ";
+		var br = document.createElement("br");
+		document.getElementById('clockList').appendChild(txt);
+		document.getElementById('clockList').appendChild(a);
+		document.getElementById('clockList').appendChild(br);
+	}
+
+	
+	function testIP(IP) {
+		$.get("http://"+IP+"/DETECT", function(data, status){
+			if (data.includes("clock-")) {
+				var d = data.split(" ");
+				makeClockLink(d[0], d[1]);
+				document.getElementById('clockNone').textContent = "";
+			}
+		});
+	}
+</script>
+
+ 
+</body></html>

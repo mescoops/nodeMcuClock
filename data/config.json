@@ -1,0 +1,8 @@
+{
+   "tz" : -8,
+   "dst" : 1,
+   "mode" : "2",
+   "muteHours" : 0,
+   "muteStart" : 23,
+   "muteEnd" : 6
+}
