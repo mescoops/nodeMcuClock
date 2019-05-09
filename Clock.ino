@@ -1,4 +1,3 @@
-#include <DNSServer.h>
 #include <WiFiManager.h>
 #include <TimeLib.h>
 #include <ESP8266mDNS.h>
@@ -54,7 +53,8 @@ void setup() {
 	Serial.println ();
 
 	// Init file system
-	SPIFFS.begin();
+	if (!SPIFFS.begin())
+    Serial.println ("An Error has occurred while mounting SPIFFS");
 
 	//set led pin as output
 	pinMode(BUILTIN_LED, OUTPUT);
@@ -144,4 +144,3 @@ void loop () {
 	delay(0);
 	webHandlers.doHandling();
 }
-

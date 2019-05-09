@@ -1,8 +1,9 @@
 {
-   "tz" : -8,
-   "dst" : 1,
+   "tz" : -800,
+   "dst" : 0,
    "mode" : "2",
-   "muteHours" : 0,
-   "muteStart" : 23,
-   "muteEnd" : 6
+   "mute" : 0,
+   "mute_start" : 230,
+   "mute_end" : 60,
+   "server" : "pool.ntp.com"
 }

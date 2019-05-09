@@ -65,7 +65,7 @@ String WebHandlers::getContentType(String filename) { // convert the file extens
 }
 
 bool WebHandlers::handleFileRead(String path) { // send the right file to the client (if it exists)
-	Serial.println("handleFileRead: " + path);
+	//Serial.println("handleFileRead: " + path);
 	if (path.endsWith("/")) path += "index.html";         // If a folder is requested, send the index file
 	bool root   = path.endsWith("/index.html");
 	bool values = path.endsWith("/values");
@@ -73,10 +73,13 @@ bool WebHandlers::handleFileRead(String path) { // send the right file to the cl
 	bool test   = path.indexOf("TEST")>0;
 	bool detect = path.indexOf("DETECT")>0;
 	bool mute1  = path.indexOf("MUTE1")>0;
+  bool curTime  = path.indexOf("CURTIME")>0;
 	bool curMute  = path.indexOf("CURMUTE")>0;
 	bool rstMute  = path.indexOf("RSTMUTE")>0;
 	bool lastSync = path.indexOf("LASTSYNC")>0;
 	String contentType = getContentType(path);            // Get the MIME type
+  if (!curTime)
+    Serial.println("handleFileRead: " + path);
 	if (SPIFFS.exists(path)) {                            // If the file exists
 		File file = SPIFFS.open(path, "r");                 // Open it
 		if (root)
@@ -97,6 +100,9 @@ bool WebHandlers::handleFileRead(String path) { // send the right file to the cl
 	} else if (detect) {
 		handleDetect();
 		return true;
+  } else if (curTime) {
+    handleCurTime();
+    return true;
 	} else if (mute1) {
 		handleMuteMore();
 		return true;
@@ -149,6 +155,14 @@ void WebHandlers::handleCurMute() {
 	Serial.println("Cur Mute");
 }
 
+void WebHandlers::handleCurTime() {
+  int h = hour();
+  int m = minute();
+  int s = second();
+  String res = (h<10?"0":"")+String(h)+":"+(m<10?"0":"")+String(m)+":"+(s<10?"0":"")+String(s);
+  server.send(200, "text/plain", res);
+  //Serial.println("Cur Time "+res);
+}
 
 void WebHandlers::handleResetMute() {
 	mute.dynMute = 0;
@@ -162,5 +176,3 @@ void WebHandlers::handleLastSync() {
 	Serial.print("Last Sync ");
 	Serial.println(s);
 }
-
-

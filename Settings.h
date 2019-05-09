@@ -13,13 +13,15 @@ public:
 	String getValues();
   int8_t getTimeZone();
   int8_t getMinutesTimeZone();
-
+  char* getNtpServer();
+  bool getSummer();
 	int clock_mode = 0;
 private:
 	Mute &mute;
 	ID &id;
 	int time_tz;
 	bool time_dst = true;
+  String ntp_server = "pool.ntp.com";
 };
 
 #endif

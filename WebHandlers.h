@@ -23,6 +23,7 @@ private:
 	bool handleFileRead(String path);
 	void handleTest(String t);
 	void handleDetect();
+  void handleCurTime();
 	void handleMuteMore();
 	void handleCurMute();
 	void handleResetMute();

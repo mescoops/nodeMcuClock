@@ -3,6 +3,7 @@
 
 // NTP every 4 hours
 #define NTP_INTERVAL 3600*4
+#define NTP_TIMEOUT 2000
 
 NetTime::NetTime(Settings &s) : settings(s){ }
 
@@ -30,7 +31,10 @@ void NetTime::setup() {
 }
 
 void NetTime::startup() {
-	NTP.begin("pool.ntp.org", settings.getTimeZone(), true, settings.getMinutesTimeZone());
+  // tw.pool.ntp.org
+  // pool.ntp.org
+  //NTP.setNTPTimeout(NTP_TIMEOUT);
+	NTP.begin(settings.getNtpServer(), settings.getTimeZone(), settings.getSummer(), settings.getMinutesTimeZone());
 	NTP.setInterval(NTP_INTERVAL);
 }
 
@@ -40,4 +44,3 @@ void NetTime::loop() {
 		syncEventTriggered = false;
 	}
 }
-
