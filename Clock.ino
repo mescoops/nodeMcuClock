@@ -10,19 +10,35 @@
 #include "PinDefs.h"
 #include "NetTime.h"
 
+// Delay when staring to check if you press the reset button
+// Gives you time to powerclock up and then find the button and press it
 #define RESET_WAIT_DELAY 4000
 
 // Give mDNS time to reply
 #define SERVER_STARTUP_DELAY 20000
 
+// Info on this clock: IP and MAC addr
 ID id;
+
+// Start and stop time of mute overnight
 Mute mute;
+
+// Saved settings
 Settings settings(mute, id);
+
+// Thing that rings chimes
 Ring ring(mute, settings);
+
+// Process web controls
 WebHandlers webHandlers(mute, settings, id, ring);
+
+// Get time from NTP
 NetTime nettime(settings);
+
+// Main control ticker
 Ticker mainTicker;
 
+// If first connected, start checking time from net
 bool wifiFirstConnected = false;
 
 void blinkLED() {
@@ -42,6 +58,7 @@ void configModeCallback (WiFiManager *myWiFiManager) {
 }
 
 
+// Check if we need to ring some bells
 void checkForRing() {
 	ring.checkForRing();
 }
@@ -82,11 +99,13 @@ void setup() {
 
 	Serial.println ();
 
+  // Blink LED for setup mode
 	mainTicker.attach(1.5, blinkLED);
 
 	// wait a bit on boot to give time to press rest button
 	delay(RESET_WAIT_DELAY);
-	//reset settings
+  
+	// reset settings if button has been pressed
 	if (!digitalRead(RESET_PIN)) {
 		Serial.println ("Reset WiFI");
 		wifiManager.resetSettings();
