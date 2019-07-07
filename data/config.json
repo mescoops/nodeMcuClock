@@ -5,5 +5,5 @@
    "mute" : 0,
    "mute_start" : 230,
    "mute_end" : 60,
-   "server" : "pool.ntp.com"
+   "server" : "pool.ntp.org"
 }

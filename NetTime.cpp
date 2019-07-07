@@ -11,13 +11,15 @@ void processSyncEvent (NTPSyncEvent_t ntpEvent) {
 	if (ntpEvent) {
 		Serial.print ("Time Sync error: ");
 		if (ntpEvent == noResponse)
-			Serial.println ("NTP server not reachable");
+			Serial.print ("NTP server not reachable - ");
 		else if (ntpEvent == invalidAddress)
-			Serial.println ("Invalid NTP server address");
+			Serial.print ("Invalid NTP server address - ");
 	} else {
 		Serial.print ("Got NTP time: ");
-		Serial.println (NTP.getTimeDateString (NTP.getLastNTPSync ()));
+		Serial.print (NTP.getTimeDateString (NTP.getLastNTPSync ()));
+    Serial.print (" ");
 	}
+  Serial.println(NTP.getNtpServerName());
 }
 
 boolean syncEventTriggered = false; // True if a time even has been triggered
