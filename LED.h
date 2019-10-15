@@ -1,3 +1,6 @@
+// LED
+// Blinks (slow) or flashes (short bip) LED
+
 #ifndef led_h
 #define led_h
 

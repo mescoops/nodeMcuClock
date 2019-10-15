@@ -1,3 +1,6 @@
+// Actuator
+// Toggles pins or sets of pins to activate actuator
+
 #ifndef actuator_h
 #define actuator_h
 

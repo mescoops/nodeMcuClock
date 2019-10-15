@@ -1,3 +1,6 @@
+// ID
+// Holds info about this hardware
+
 #ifndef id_h
 #define id_h
 

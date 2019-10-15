@@ -46,3 +46,7 @@ void NetTime::loop() {
 		syncEventTriggered = false;
 	}
 }
+
+void NetTime::getTime() {
+  NTP.getTime();
+}

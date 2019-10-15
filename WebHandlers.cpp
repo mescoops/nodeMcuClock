@@ -3,24 +3,33 @@
 #include <ESP8266WebServer.h>
 #include "WebHandlers.h"
 #include "Settings.h"
+#include "NetTime.h"
 #include "Mute.h"
 #include "Ring.h"
+#include "Button.h"
+#include "PinDefs.h"
+#include "LED.h"
 
 ESP8266WebServer server(80);
+Button button;
+static WebHandlers* inst; 
 
 WebHandlers::WebHandlers(Mute &m, Settings &s, ID &i, Ring &r) : mute(m), settings(s), id(i), ring(r){}
 
 void WebHandlers::setup() {
+  inst = this;
 	server.onNotFound([&]() {                              // If the client requests any URI
 		if (!handleFileRead(server.uri()))                  // send it if it exists
 			server.send(404, "text/plain", "404: Not Found"); // otherwise, respond with a 404 (Not Found) error
 	});
 
 	server.begin();
+  button.setup(RESET_PIN, handleMuteMore, handleResetMute);
 }
 
 void WebHandlers::doHandling() {
 	server.handleClient();
+  button.check();
 }
 
 void WebHandlers::handleRoot(File file) {
@@ -77,6 +86,7 @@ bool WebHandlers::handleFileRead(String path) { // send the right file to the cl
 	bool curMute  = path.indexOf("CURMUTE")>0;
 	bool rstMute  = path.indexOf("RSTMUTE")>0;
 	bool lastSync = path.indexOf("LASTSYNC")>0;
+  bool syncNow  = path.indexOf("SYNCNow")>0;
 	String contentType = getContentType(path);            // Get the MIME type
   if (!curTime)
     Serial.println("handleFileRead: " + path);
@@ -115,6 +125,9 @@ bool WebHandlers::handleFileRead(String path) { // send the right file to the cl
 	} else if (lastSync) {
 		handleLastSync();
 		return true;
+  } else if (syncNow) {
+    handleSyncNow();
+    return true;
 	}
 	Serial.println("\tFile Not Found");
 	return false;                                         // If the file doesn't exist, return false
@@ -139,15 +152,6 @@ void WebHandlers::handleDetect() {
 	Serial.println("Detect");
 }
 
-void WebHandlers::handleMuteMore() {
-	Serial.println("Add 1 Hour Mute");
-	if (mute.dynMute + 60 <= 1500) // 25 hours max
-		mute.dynMute += 60;
-	Serial.print("Values: ");
-	Serial.println(mute.dynMute);
-	server.send(200, "text/plain", "ok");
-}
-
 
 void WebHandlers::handleCurMute() {
 	int res = mute.calcCurMute();
@@ -164,15 +168,33 @@ void WebHandlers::handleCurTime() {
   //Serial.println("Cur Time "+res);
 }
 
-void WebHandlers::handleResetMute() {
-	mute.dynMute = 0;
-	server.send(200, "text/plain", "Reset ok");
-	Serial.println("Reset Mute");
-}
-
 void WebHandlers::handleLastSync() {
 	String s = NTP.getTimeDateString(NTP.getLastNTPSync());
 	server.send(200, "text/plain", s);
 	Serial.print("Last Sync ");
 	Serial.println(s);
+}
+
+void WebHandlers::handleResetMute() {
+  LED::blinkLong();
+  inst->mute.dynMute = 0;
+  server.send(200, "text/plain", "Reset ok");
+  Serial.println("Reset Mute");
+}
+
+void WebHandlers::handleMuteMore() {
+  Serial.println("Add 1 Hour Mute");
+  if (inst->mute.dynMute + 60 <= 1500) // 25 hours max
+    inst->mute.dynMute += 60;
+  int muteHours = (inst->mute.dynMute+50)/60; // round up to 60, sort of
+  LED::blinkTimes(muteHours);
+  Serial.print("Values: ");
+  Serial.println(inst->mute.dynMute);
+  server.send(200, "text/plain", "ok");
+}
+
+void WebHandlers::handleSyncNow() {
+  NetTime::getTime();
+  server.send(200, "text/plain", "Sync ok");
+  Serial.println("Sync Now");
 }

@@ -1,3 +1,6 @@
+// PinDefs
+// Some GPIO Pin definitions for Arduino / NodeMCU
+
 #ifndef pindefs_h
 #define pindefs_h
 

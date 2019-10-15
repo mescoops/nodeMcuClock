@@ -9,13 +9,17 @@
 #include "ID.h"
 #include "PinDefs.h"
 #include "NetTime.h"
+#include "LED.h"
+#include "RemoteDebug.h"
 
 // Delay when staring to check if you press the reset button
-// Gives you time to powerclock up and then find the button and press it
+// Gives you time to power clock up and then find the button and press it
 #define RESET_WAIT_DELAY 4000
 
 // Give mDNS time to reply
 #define SERVER_STARTUP_DELAY 20000
+
+RemoteDebug Debug;
 
 // Info on this clock: IP and MAC addr
 ID id;
@@ -26,8 +30,8 @@ Mute mute;
 // Saved settings
 Settings settings(mute, id);
 
-// Thing that rings chimes
-Ring ring(mute, settings);
+// Thing that rings chimes on quarters, hours
+Ring ring(mute, settings, Debug);
 
 // Process web controls
 WebHandlers webHandlers(mute, settings, id, ring);
@@ -41,11 +45,6 @@ Ticker mainTicker;
 // If first connected, start checking time from net
 bool wifiFirstConnected = false;
 
-void blinkLED() {
-	//toggle led state
-	int state = digitalRead(BUILTIN_LED);  // get the current state of GPIO1 pin
-	digitalWrite(BUILTIN_LED, !state);     // set pin to the opposite state
-}
 
 //gets called when WiFiManager enters configuration mode
 void configModeCallback (WiFiManager *myWiFiManager) {
@@ -54,9 +53,19 @@ void configModeCallback (WiFiManager *myWiFiManager) {
 	//if you used auto generated SSID, print it
 	Serial.println(myWiFiManager->getConfigPortalSSID());
 	//entered config mode, make led toggle faster
-	mainTicker.attach(0.2, blinkLED);
+	LED::blink(0.2);
 }
 
+
+// line up ticker to 5th second
+void setupClockCheck() {
+  int secs = second();
+  if ((secs % 5)==0) {
+    mainTicker.detach();
+    // Check every 5 seconds
+    mainTicker.attach(5.0, checkForRing);
+  }
+}
 
 // Check if we need to ring some bells
 void checkForRing() {
@@ -73,8 +82,7 @@ void setup() {
 	if (!SPIFFS.begin())
     Serial.println ("An Error has occurred while mounting SPIFFS");
 
-	//set led pin as output
-	pinMode(BUILTIN_LED, OUTPUT);
+  LED::setupLED();
 	// set reset pin as input
 	pinMode(RESET_PIN, INPUT_PULLUP);
 
@@ -100,9 +108,9 @@ void setup() {
 	Serial.println ();
 
   // Blink LED for setup mode
-	mainTicker.attach(1.5, blinkLED);
+  LED::blink(1.5);
 
-	// wait a bit on boot to give time to press rest button
+	// wait a bit on boot to give time to press reset button
 	delay(RESET_WAIT_DELAY);
   
 	// reset settings if button has been pressed
@@ -115,17 +123,16 @@ void setup() {
 	WiFiManagerParameter custom_text(lab.c_str());
 	wifiManager.addParameter(&custom_text);
 
-	// start ticker with 0.5 because we start in AP mode and try to connect
-	mainTicker.attach(0.6, blinkLED);
+	// Blink every 0.6 because we start in AP mode and try to connect
+  LED::blink(0.6);
 
 	//first parameter is name of access point, second is the password
 	String url = "<a href=http://"+id.clientMac+".local>"+id.clientMac+".local</a>";
 	String scClock = "Scoops' Clock "+id.lastOfMac();//<br>"+url;
 	wifiManager.autoConnect(scClock.c_str(), "dingding");
 
-	mainTicker.detach();
-	//keep LED on
-	digitalWrite(BUILTIN_LED, LOW);
+  //LED off, then long period flashing
+  LED::flash(60.0);
 
 	id.setIP();
 
@@ -142,13 +149,22 @@ void setup() {
 
 	nettime.setup();
 
+  Debug.begin("CLOCK");
+  Debug.setResetCmdEnabled(true); // Enable the reset command
+  Debug.showColors(true); // Colors
+  String helpCmd = "hist - Histoty of dings\n";
+  //helpCmd.concat("bench2 - Benchmark 2");
+  Debug.setHelpProjectsCmds(helpCmd);
+  Debug.setCallBackProjectCmds(&processCmdRemoteDebug);
+
 	settings.loadConfig();
 
 	webHandlers.setup();
 
 	delay(SERVER_STARTUP_DELAY);
 
-	mainTicker.attach(5.0, checkForRing);
+  // Find next 5th second, then start clock
+  mainTicker.attach(0.5, setupClockCheck);
 }
 
 
@@ -159,7 +175,14 @@ void loop () {
 	}
 
 	nettime.loop();
-
-	delay(0);
 	webHandlers.doHandling();
+  Debug.handle();
+  yield();
+}
+
+void processCmdRemoteDebug() {
+  String lastCmd = Debug.getLastCommand();
+  if (lastCmd == "hist") {
+    ring.getLogs();
+  }
 }

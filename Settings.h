@@ -1,3 +1,6 @@
+// Settings
+// Saves settings in SPIFFS
+
 #ifndef settings_h
 #define settings_h
 

@@ -1,3 +1,6 @@
+// WebHandlers
+// Generates web page and handles POST data
+
 #ifndef webHandlrs_h
 #define webHandlrs_h
 
@@ -24,11 +27,12 @@ private:
 	void handleTest(String t);
 	void handleDetect();
   void handleCurTime();
-	void handleMuteMore();
 	void handleCurMute();
-	void handleResetMute();
 	void handleLastSync();
+  void handleSyncNow();
 	void handleValues();
+  static void handleMuteMore();
+  static void handleResetMute();
 };
 
 #endif

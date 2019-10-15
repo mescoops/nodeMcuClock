@@ -69,6 +69,7 @@
               <option value="0">Hour Only</option>
               <option value="1">Hour and Half Past</option>
               <option value="2">All Quarters</option>
+              <option value="3">Westminster</option>
 			</select><br>
 			<hr style="height:2px; visibility:hidden;" />
 				<div>Timezone</div>
@@ -110,7 +111,8 @@
 					</select>
 			<input type="checkbox" name="time_dst" id="time_dst"> Summer Time
 			<hr style="height:2px; visibility:hidden;" />
-			NTP Server <input type="text" name="ntp_server" id="ntp_server" value="pool.ntp.org"><br>
+			NTP Server <input type="text" name="ntp_server" id="ntp_server" value="pool.ntp.org">
+			<button id="SY-btn" class="btn btn--s btn--blue">Sync</button><br>
         <div>
 			<br><button id="SV-btn" style="width:150px" class="btn btn--m btn--blue">Save</button></td>
 		</div>
@@ -132,11 +134,13 @@
 		const butt_hr = document.getElementById('HR-btn');
 		const butt_m1 = document.getElementById('M1-btn');
 		const butt_mr = document.getElementById('MR-btn');
+		const butt_sy = document.getElementById('SY-btn');
 		butt_Sv.addEventListener('click', _ => {saveData()});
 		butt_q1.addEventListener('click', _ => {fetch('TESTq1', { method: 'POST'})});
 		butt_hf.addEventListener('click', _ => {fetch('TESThf', { method: 'POST'})});
 		butt_q3.addEventListener('click', _ => {fetch('TESTq3', { method: 'POST'})});
 		butt_hr.addEventListener('click', _ => {fetch('TESThr', { method: 'POST'})});
+		butt_sy.addEventListener('click', _ => {fetch('SYNCNow', { method: 'POST'})});
 		butt_m1.addEventListener('click', _ => {
 			fetch('MUTE1',  { method: 'POST'});
 			updateMuteTime();

@@ -1,3 +1,6 @@
+// Button
+// Sets action for short or long press
+
 #ifndef button_h
 #define button_h
 typedef void (*ButtonAction) ();

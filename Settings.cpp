@@ -39,19 +39,20 @@ bool Settings::getDataFromJson(const char* buf) {
 	}
 
 	time_tz    = json["tz"];
-	time_dst   = json["dst"] != 0;
+	time_dst   = json["dst"].as<String>() == "true";
 	clock_mode = json["mode"];
   ntp_server = json["server"].as<String>();
   if (ntp_server == NULL || ntp_server == "null")
     ntp_server = "pool.ntp.org";
 
-	mute.mute_enab  = json["mute"] != 0;
+	mute.mute_enab  = json["mute"].as<String>() == "true";
 	mute.mute_start = json["mute_start"];
 	mute.mute_end   = json["mute_end"];
 
 	Serial.println("Loaded config");
-	Serial.print("     tz "); Serial.println(time_tz);
+  Serial.print("     tz "); Serial.println(time_tz);
 	Serial.print("    dst "); Serial.println(time_dst);
+  Serial.print("    dst "); Serial.println(json["dst"].as<String>());
 	Serial.print("   mode "); Serial.println(clock_mode);
   Serial.print(" server "); Serial.println(ntp_server);
 	Serial.print("   mute "); Serial.println(mute.mute_enab);
@@ -94,7 +95,7 @@ String Settings::getValues() {
 	values += "mute_enab|"  + (String)(mute.mute_enab ? "checked" : "") + "|chk\n";
 	values += "mute_start|" + (String)mute.mute_start + "|input\n";
 	values += "mute_end|"   + (String)mute.mute_end + "|input\n";
-	values += "clock_mute|Mute "+(mute.dynMute>0?"Ends: "+(String)mute.dynMute:"Off") + "|span\n";
+	values += "clock_mute|Mute "+(mute.dynMute>0?"Ends: "+(String)(mute.dynMute/60):"Off") + "|span\n";
 	Serial.print("Values: ");
 	Serial.println(values);
 	return values;

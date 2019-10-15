@@ -1,3 +1,6 @@
+// NetTime
+// Periodically gets time from NTP server
+
 #ifndef nettime_h
 #define nettime_h
 
@@ -9,6 +12,7 @@ public:
 	void setup();
 	void startup();
 	void loop();
+  static void getTime();
 private:
 	Settings &settings;
 };

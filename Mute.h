@@ -1,3 +1,7 @@
+// Mute
+// Hold info of set mute start and end
+// Calculates if current time is within the mute period
+
 #ifndef mute_h
 #define mute_h
 
