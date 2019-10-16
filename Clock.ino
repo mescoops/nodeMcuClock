@@ -57,13 +57,13 @@ void configModeCallback (WiFiManager *myWiFiManager) {
 }
 
 
-// line up ticker to 5th second
+// line up ticker to 0th second
 void setupClockCheck() {
   int secs = second();
-  if ((secs % 5)==0) {
+  if ((secs % 60)==0) {
     mainTicker.detach();
     // Check every 5 seconds
-    mainTicker.attach(5.0, checkForRing);
+    mainTicker.attach(60.0, checkForRing);
   }
 }
 

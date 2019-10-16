@@ -130,27 +130,24 @@ void Ring::getLogs() {
 }
 
 
-// called every 5 seconds
+// called every 60 seconds
 void Ring::checkForRing() {
   static bool checking = false;
-  static int last = -100;
   if (checking) return;
   checking = true;
 
-  int secs = second();
   //Debug.print("Sec ");
   //Debug.println(secs);
   
   // decrement mute every minute, if we are muted
-  if (mute.dynMute>0 && secs <7) {
+  if (mute.dynMute>0) {
     mute.dynMute -= 1;
     //Debug.print("Dec MUte ");
     //Debug.println(mute.dynMute);
   }
 
-  // Check every 5 seconds if we need to ring
+  // Check every 60 seconds if we need to ring
   //   Are we ringing?
-  //   Is it less than 5 seconds? (close to the minute)
   //   Is it 0 minutes? (The hour)
   //   Is it 30 minutes?
   //   Is it 15 or 45 minutes?
@@ -159,16 +156,7 @@ void Ring::checkForRing() {
     checking = false;
     return;
   }
-
-  // Do ring only within 6 seconds after the minute
-  // or we already rang, so skip for now
-  if (secs>6 || last>=0) {
-    last = -100; // Next time will be OK
-    checking = false;
-    return;
-  }
-  last = secs; // 0-59
-
+  
   int mins = minute();
   bool isHour = mins == 0;// || (mins>0 && mins<=10);
   bool isHalf = mins == 30;
