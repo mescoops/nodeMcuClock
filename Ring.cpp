@@ -24,9 +24,15 @@ char bellToChar(int b){
   if (b==F) return 'F';
   if (b==G) return 'G';
   if (b==END) return 'n';
-  if (b==PAUSE) return '.';
+  if (b==PAUSE) return '.'; 
   return '?';
 }
+
+enum BellType {
+  regulr,
+  westmin,
+  ships
+};
 
 int listRQ1[5] = {C, C, PAUSE, A, END};
 int listRHf[6] = {B, B, PAUSE, A, C, END};
@@ -37,6 +43,8 @@ int listRHr[6] = {C, B, C, B, A, END};
 int listRCh[2] = {C, A};
 int listRChLen = 2;
 float listRChPeriod = 0.9;
+
+float regChPeriod = 0.7;
 
 int listHHf[2] = {B, END};
 int listHHr[1] = {END};
@@ -58,6 +66,12 @@ int listWChLen = 2;
 float listWChPeriod = 1.2;
 ////////////////////////////////
 
+//////////////////////////////////
+// Ship's Clock
+int listShipBase[12] = {A, A, PAUSE, A, A, PAUSE, A, A, PAUSE, A, A, END};
+int listShip[12];
+float shipChPeriod = 0.4;
+////////////////////////////////
 
 int *listQ1;
 int *listHf;
@@ -89,6 +103,7 @@ Ring::Ring(Mute &m, Settings &s, RemoteDebug &d) : mute(m), settings(s), Debug(d
   instance = this;
   for (int i=0; i<12; i++)
      logs[i] = "OK";
+  logExtra = "Start";
 }
 
 void Ring::printdbg() {
@@ -127,6 +142,7 @@ void Ring::printdbgLog() {
 void Ring::getLogs() {
   for (int i=0; i<12; i++)
      Debug.println(logs[i]);
+  Debug.println(logExtra);
 }
 
 
@@ -153,6 +169,7 @@ void Ring::checkForRing() {
   //   Is it 15 or 45 minutes?
 
   if (mute.calcCurMute()!=0 || isRinging) {
+    logExtra = String("Mute or Ring ")+isRinging;
     checking = false;
     return;
   }
@@ -163,6 +180,8 @@ void Ring::checkForRing() {
   bool is1Qtr = mins == 15;
   bool is3Qtr = mins == 45;
 
+  logExtra = String(" Check ")+isHour+"  "+isHalf+"  "+is1Qtr+"  "+is3Qtr+"  "+mins;
+
   if (isHour || isHalf || is1Qtr || is3Qtr)
     doAllRing(isHour, isHalf, is1Qtr, is3Qtr);
     
@@ -170,8 +189,8 @@ void Ring::checkForRing() {
 }
 
 
-void setHourLists(bool westm) {
-  if (westm) {
+void setHourLists(BellType t) {
+  if (t==westmin) {
     listQ1 = listWQ1;
     listHf = listWHf;
     listQ3 = listWQ3;
@@ -191,14 +210,20 @@ void setHourLists(bool westm) {
 }
 
 void Ring::doAllRing(bool hr, bool hf, bool q1, bool q3) {
-  isRinging = hr || hf || q1 || q3;
-  setHourLists(settings.clock_mode == CLOCK_WESTM);
-  if (settings.clock_mode == CLOCK_ALL || settings.clock_mode == CLOCK_WESTM)
-    doRing(hr, hf, q1, q3);
+  BellType t = regulr;
+  if (settings.clock_mode == CLOCK_WESTM) t = westmin;
+  if (settings.clock_mode == CLOCK_SHIPS) t = ships;
+  setHourLists(t);
+  if (settings.clock_mode == CLOCK_SHIPS)
+    isRinging = doRingShips(hr, hf);
+  else if (settings.clock_mode == CLOCK_ALL || settings.clock_mode == CLOCK_WESTM)
+    isRinging = doRing(hr, hf, q1, q3);
   else if (settings.clock_mode == CLOCK_HALF)
-    doRing(hr, hf);
+    isRinging = doRing(hr, hf);
   else if (settings.clock_mode == CLOCK_HOUR)
-    doRing(hr);
+    isRinging = doRing(hr);
+  else
+    isRinging = false;
 }
 
 
@@ -212,7 +237,7 @@ int Ring::findHrType() {
     return HR_HOUR;
 }
 
-void Ring::doRing(bool hr, bool hf, bool q1, bool q3) {
+bool Ring::doRing(bool hr, bool hf, bool q1, bool q3) {
   doHour = hr ? findHrType() : HR_NONE;
   if (q1)
     play(listQ1);
@@ -222,25 +247,60 @@ void Ring::doRing(bool hr, bool hf, bool q1, bool q3) {
     play(listHf);
   else if (hr)
     play(listHr);
+  return true;
 }
 
-void Ring::doRing(bool hr, bool hf) {
+void findShipRing(bool hlf) {
+  //{A, A, PAUSE, A, A, PAUSE, A, A, PAUSE, A, A, END};
+  int h = hour();
+  h = h % 4;
+  // copy base list
+  for (int i=0; i<12; i++)
+    listShip[i] = listShipBase[i];
+  // if 8 bells, just use that.
+  if (h==0 && !hlf)
+    return;
+  // put END after bell
+  // if one bell, put END after 1 
+  int p = h * 3 + (hlf ? 1 : -1);
+  listShip[p] = END;
+}
+
+bool Ring::doRingShips(bool hr, bool hf) {
+  //instance->Debug.print("Chime ");
+  //instance->Debug.println(hr);
+  if (!hr && !hf) return false;
+  doHour = HR_NONE; // Ship's bells have no "hour"
+  findShipRing(hf);
+  play(listShip, shipChPeriod);
+  return true;
+}
+
+bool Ring::doRing(bool hr, bool hf) {
+  if (!hr && !hf) return false;
   doHour = hr ? findHrType() : HR_NONE;
   if (hf)
     play(listHHf);
   else if (hr)
     play(listHHr);
+  return true;
 }
 
 
-void Ring::doRing(bool hr) {
+bool Ring::doRing(bool hr) {
+  if (!hr) return false;
   doHour = hr ? findHrType() : HR_NONE;
   play(listHHr);
+  return true;
+}
+
+void Ring::play(int p[]) {
+  play(p, regChPeriod);
 }
 
 // Play this list of notes
 // List should end with END
-void Ring::play(int p[]) {
+void Ring::play(int p[], float period) {
   pIdx = 0;
   pList = p;
   // Find len
@@ -254,7 +314,7 @@ void Ring::play(int p[]) {
   //Serial.print("Play Len ");
   //Serialx.println(ll);
   // Play list items every 0.7
-  ringer.attach(0.7, ding);
+  ringer.attach(period, ding);
 }
 
 void Ring::ding() {

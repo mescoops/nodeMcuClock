@@ -8,6 +8,7 @@
 #include "Settings.h"
 #include "RemoteDebug.h"
 
+#define CLOCK_SHIPS  4
 #define CLOCK_WESTM  3
 #define CLOCK_ALL    2
 #define CLOCK_HALF   1
@@ -29,14 +30,17 @@ class Ring {
     Settings &settings;
     void getLogs();
     String logs[12];
+    String logExtra;
     void printdbg();
     void printdbgLog();
   private:
     RemoteDebug &Debug;
-    void doRing(bool hr, bool hf, bool q1, bool q3);
-    void doRing(bool hr, bool hf);
-    void doRing(bool hr);
+    bool doRing(bool hr, bool hf, bool q1, bool q3);
+    bool doRing(bool hr, bool hf);
+    bool doRing(bool hr);
+    bool doRingShips(bool hr, bool hf);
     int findHrType();
+    void play(int p[], float period);
     void play(int p[]);
     static void ding();
 };
