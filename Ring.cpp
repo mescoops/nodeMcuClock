@@ -70,7 +70,7 @@ float listWChPeriod = 1.2;
 // Ship's Clock
 int listShipBase[12] = {A, A, PAUSE, A, A, PAUSE, A, A, PAUSE, A, A, END};
 int listShip[12];
-float shipChPeriod = 0.4;
+float shipChPeriod = 0.5;
 ////////////////////////////////
 
 int *listQ1;
@@ -313,7 +313,7 @@ void Ring::play(int p[], float period) {
   }
   //Serial.print("Play Len ");
   //Serialx.println(ll);
-  // Play list items every 0.7
+  // Play list items at intervals
   ringer.attach(period, ding);
 }
 
