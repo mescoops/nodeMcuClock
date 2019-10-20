@@ -1,93 +1,31 @@
 #include <Arduino.h>
 #include <TimeLib.h>
 #include <Ticker.h>
+#include "Chime.h"
 #include "Ring.h"
-#include "PinDefs.h"
 #include "Actuator.h"
 
-int A = BELL_A_PIN;
-int B = BELL_B_PIN;
-int C = BELL_C_PIN;
-int D = BELL_D_PIN;
-int E = BELL_E_PIN;
-int F = BELL_F_PIN;
-int G = BELL_G_PIN;
-int END = -100;
-int PAUSE = -1;
 
-char bellToChar(int b){
-  if (b==A) return 'A';
-  if (b==B) return 'B';
-  if (b==C) return 'C';
-  if (b==D) return 'D';
-  if (b==E) return 'E';
-  if (b==F) return 'F';
-  if (b==G) return 'G';
-  if (b==END) return 'n';
-  if (b==PAUSE) return '.'; 
-  return '?';
-}
+Chime westminster = Chime::westminster();
+Chime quarters    = Chime::quarters();
+Chime halfsMulti  = Chime::halfsMulti();
+Chime halfsSingle = Chime::halfsSingle();
+Chime hours       = Chime::hours();
 
-enum BellType {
-  regulr,
-  westmin,
-  ships
-};
+Chime chime;
 
-int listRQ1[5] = {C, C, PAUSE, A, END};
-int listRHf[6] = {B, B, PAUSE, A, C, END};
-int listRQ3[7] = {A, A, PAUSE, C, B, C, END};
-int listRHr[6] = {C, B, C, B, A, END};
-
-// Pair of chimes for Hour chiming
-int listRCh[2] = {C, A};
-int listRChLen = 2;
-float listRChPeriod = 0.9;
-
-float regChPeriod = 0.7;
-
-int listHHf[2] = {B, END};
-int listHHr[1] = {END};
-int listHCh[3] = {A, C, END};
-
-
-//////////////////////////////////
-// Westminster
-// G♯4, F♯4, E4, B3
-// D    C    B   A
-
-int listWQ1[5]  = {D, C, B, A, END};
-int listWHf[10] = {B, D, C, A, PAUSE, B, C, D, B, END};
-int listWQ3[15] = {D, B, C, A, PAUSE, A, C, D, B, PAUSE, D, C, B, A, END};
-int listWHr[20] = {B, D, C, A, PAUSE, B, C, D, B, PAUSE, D, B, C, A, PAUSE, A, C, D, B, END};
-
-int listWCh[2] = {B, A};
-int listWChLen = 2;
-float listWChPeriod = 1.2;
 ////////////////////////////////
 
 //////////////////////////////////
 // Ship's Clock
-int listShipBase[12] = {A, A, PAUSE, A, A, PAUSE, A, A, PAUSE, A, A, END};
 int listShip[12];
-float shipChPeriod = 0.5;
 ////////////////////////////////
-
-int *listQ1;
-int *listHf;
-int *listQ3;
-int *listHr;
-
-int *listCh;
-int listChLen;
-float listChPeriod;
 
 int pIdx = 0;
 int *pList;
 int pLen = 0;
 Ticker ringer;
 bool isRinging = false;
-int doHour = HR_NONE;
 int hourCount;
 
 Ring *instance;
@@ -145,6 +83,29 @@ void Ring::getLogs() {
   Debug.println(logExtra);
 }
 
+Ring::QTR Ring::calcQuarter(bool hr, bool hf, bool q1, bool q3) {
+  if (hr) return q_hr;
+  if (hf) return q_hf;
+  if (q1) return q_q1;
+  if (q3) return q_q3;
+  return q_no;
+}
+
+String toString(Ring::QTR v) {
+    switch (v) {
+        case Ring::q_hr:   return "q_hr";
+        case Ring::q_hf:   return "q_hf";
+        case Ring::q_q1: return "q_q1";
+        case Ring::q_q3: return "q_q3";
+        default:      return "qqq";
+    }
+}
+
+Ring::QTR Ring::calcQuarter() {
+  int mins = minute();
+  //logExtra = String(" Check ")+currQuarter+"  "+mins;
+  return calcQuarter(mins==0, mins==30, mins==15, mins==45);
+}
 
 // called every 60 seconds
 void Ring::checkForRing() {
@@ -173,140 +134,86 @@ void Ring::checkForRing() {
     checking = false;
     return;
   }
-  
-  int mins = minute();
-  bool isHour = mins == 0;// || (mins>0 && mins<=10);
-  bool isHalf = mins == 30;
-  bool is1Qtr = mins == 15;
-  bool is3Qtr = mins == 45;
 
-  logExtra = String(" Check ")+isHour+"  "+isHalf+"  "+is1Qtr+"  "+is3Qtr+"  "+mins;
+  currQuarter = calcQuarter();
 
-  if (isHour || isHalf || is1Qtr || is3Qtr)
-    doAllRing(isHour, isHalf, is1Qtr, is3Qtr);
+  if (currQuarter != q_no)
+    doAllRing();
     
   checking = false;
 }
 
+void setChimes(int t) {
+  if (t == CLOCK_WESTM)       chime = westminster;
+  if (t == CLOCK_ALL)         chime = quarters;
+  if (t == CLOCK_HALF_MULTI)  chime = halfsMulti;
+  if (t == CLOCK_HALF_SINGLE) chime = halfsSingle;
+  if (t == CLOCK_HOUR)        chime = hours;
+}
 
-void setHourLists(BellType t) {
-  if (t==westmin) {
-    listQ1 = listWQ1;
-    listHf = listWHf;
-    listQ3 = listWQ3;
-    listHr = listWHr;
-    listCh = listWCh;
-    listChLen = listWChLen;
-    listChPeriod = listWChPeriod;
+void Ring::testRing(bool hr, bool hf, bool q1, bool q3) {
+  currQuarter = calcQuarter(hr, hf, q1, q3);
+  doAllRing();
+}
+
+void Ring::doAllRing() {
+  if (settings.clock_mode == CLOCK_SHIPS) {
+    isRinging = doRingShips();
   } else {
-    listQ1 = listRQ1;
-    listHf = listRHf;
-    listQ3 = listRQ3;
-    listHr = listRHr;
-    listCh = listRCh;
-    listChLen = listRChLen;
-    listChPeriod = listRChPeriod;
+    setChimes(settings.clock_mode);
+    isRinging = doRing();
   }
 }
 
-void Ring::doAllRing(bool hr, bool hf, bool q1, bool q3) {
-  BellType t = regulr;
-  if (settings.clock_mode == CLOCK_WESTM) t = westmin;
-  if (settings.clock_mode == CLOCK_SHIPS) t = ships;
-  setHourLists(t);
-  if (settings.clock_mode == CLOCK_SHIPS)
-    isRinging = doRingShips(hr, hf);
-  else if (settings.clock_mode == CLOCK_ALL || settings.clock_mode == CLOCK_WESTM)
-    isRinging = doRing(hr, hf, q1, q3);
-  else if (settings.clock_mode == CLOCK_HALF)
-    isRinging = doRing(hr, hf);
-  else if (settings.clock_mode == CLOCK_HOUR)
-    isRinging = doRing(hr);
-  else
-    isRinging = false;
-}
-
-
-
-int Ring::findHrType() {
-  if (settings.clock_mode == CLOCK_ALL || settings.clock_mode == CLOCK_WESTM)
-    return HR_ALL;
-  else if (settings.clock_mode == CLOCK_HALF)
-    return HR_HALF;
-  else
-    return HR_HOUR;
-}
-
-bool Ring::doRing(bool hr, bool hf, bool q1, bool q3) {
-  doHour = hr ? findHrType() : HR_NONE;
-  if (q1)
-    play(listQ1);
-  else if (q3)
-    play(listQ3);
-  else if (hf)
-    play(listHf);
-  else if (hr)
-    play(listHr);
+bool Ring::doRing() {
+  if (currQuarter == q_q1)
+    play(chime.Q1);
+  else if (currQuarter == q_q3)
+    play(chime.Q3);
+  else if (currQuarter == q_hf)
+    play(chime.Hf);
+  else if (currQuarter == q_hr)
+    play(chime.Hr);
   return true;
 }
 
-void findShipRing(bool hlf) {
+void findShipRing() {
   //{A, A, PAUSE, A, A, PAUSE, A, A, PAUSE, A, A, END};
   int h = hour();
   h = h % 4;
   // copy base list
   for (int i=0; i<12; i++)
-    listShip[i] = listShipBase[i];
+    listShip[i] = Chime::shipBase[i];
   // if 8 bells, just use that.
-  if (h==0 && !hlf)
+  if (h==0 && instance->currQuarter==Ring::q_hr)
     return;
   // put END after bell
-  // if one bell, put END after 1 
-  int p = h * 3 + (hlf ? 1 : -1);
-  listShip[p] = END;
+  // eg. if one bell, put END at 1 
+  int p = h * 3 + ((instance->currQuarter==Ring::q_hf) ? 1 : -1);
+  listShip[p] = Chime::END;
 }
 
-bool Ring::doRingShips(bool hr, bool hf) {
-  //instance->Debug.print("Chime ");
-  //instance->Debug.println(hr);
-  if (!hr && !hf) return false;
-  doHour = HR_NONE; // Ship's bells have no "hour"
-  findShipRing(hf);
-  play(listShip, shipChPeriod);
+bool Ring::doRingShips() {
+  findShipRing();
+  play(listShip, Chime::shipChPeriod);
   return true;
 }
 
-bool Ring::doRing(bool hr, bool hf) {
-  if (!hr && !hf) return false;
-  doHour = hr ? findHrType() : HR_NONE;
-  if (hf)
-    play(listHHf);
-  else if (hr)
-    play(listHHr);
-  return true;
-}
-
-
-bool Ring::doRing(bool hr) {
-  if (!hr) return false;
-  doHour = hr ? findHrType() : HR_NONE;
-  play(listHHr);
-  return true;
-}
 
 void Ring::play(int p[]) {
-  play(p, regChPeriod);
+  play(p, chime.strikePeriod);
 }
 
 // Play this list of notes
 // List should end with END
 void Ring::play(int p[], float period) {
+  if (p==NULL) return;
   pIdx = 0;
   pList = p;
   // Find len
   pLen = 30; // 'default'
   for (int i=0; i<30; i++) {
-    if (p[i] == END) {
+    if (p[i] == Chime::END) {
       pLen = i;
       break;
     }
@@ -318,14 +225,14 @@ void Ring::play(int p[], float period) {
 }
 
 void Ring::ding() {
-  //  Serial.print("Ding ");
-  //  Serial.print(pIdx);
-  //  Serial.print(" ");
+  //instance->Debug.print("Ding ");
+  //instance->Debug.print(pIdx);
+  //instance->Debug.print(" ");
   // Check if we are at last in list
   if (pIdx>=pLen) {
     ringer.detach();
     // Check if we need to play hour, too
-    if (doHour != HR_NONE) {
+    if (instance->currQuarter==Ring::q_hr && instance->settings.clock_mode != CLOCK_SHIPS) {
       int hh = hour();
       if (hh>12) hh -= 12;
       if (hh==0) hh = 12;
@@ -335,7 +242,7 @@ void Ring::ding() {
   } else {
     // Play current selected note in list
     //instance->Debug.print("Chime ");
-    //instance->Debug.println(bellToChar(pList[pIdx]));
+    //instance->Debug.println(Chime::bellToChar(pList[pIdx]));
     if (instance->mute.dynMute==0) // maybe someone pressed mute?
       actuator.play(pList[pIdx]);
     pIdx++;
@@ -347,10 +254,10 @@ int delCount = 0;
 void delay1() {
     delCount--;
     if (delCount<=0) {
-    // make delay by no ringing first time
-    ringer.detach();
-    // after delay, play hour notes
-    ringer.attach(listChPeriod, hourDing);
+      // make delay by no ringing first time
+      ringer.detach();
+      // after delay, play hour notes
+      ringer.attach(chime.strikeHrPeriod, hourDing);
     }
 }
 
@@ -360,9 +267,9 @@ void playHour(int h) {
   delCount = 2;
   if (instance->settings.clock_mode == CLOCK_HOUR)
     // just play hour, so play it right away
-    ringer.attach(listChPeriod, hourDing);
+    ringer.attach(chime.strikeHrPeriod, hourDing);
   else
-    ringer.attach(1.0, delay1);
+    ringer.attach(chime.strikeHrPeriod, delay1);
 }
 
 
@@ -373,7 +280,7 @@ void hourDing() {
     isRinging = false;
   } else {
     if (instance->mute.dynMute==0) // maybe someone pressed mute?
-      actuator.play(listCh, listChLen);
+      actuator.play(chime.strikeHr, chime.strikeHrLen);
     hourCount--;
   }
 }

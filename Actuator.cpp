@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Ticker.h>
-
+#include "Chime.h"
 #include "Actuator.h"
 
 // Time for solenoid activation
@@ -31,7 +31,7 @@ void Actuator::toggPin() {
   //  Serial.print("pin ");
   //  Serial.print(currPin);
   //  Serial.println(" ");
-  if (currPin>=0) { // currPin -1 means pause
+  if (currPin>=Chime::PAUSE) { // currPin -1 means pause
     state = digitalRead(currPin);  // get the current state of GPI pin
     digitalWrite(currPin, !state);     // set pin to the opposite state
   }

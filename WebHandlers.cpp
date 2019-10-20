@@ -142,7 +142,7 @@ void WebHandlers::handleTest(String t) {
 	bool is1Qtr = t.endsWith("q1");
 	bool is3Qtr = t.endsWith("q3");
 	rooter();
-	ring.doAllRing(isHour, isHalf, is1Qtr, is3Qtr);
+	ring.testRing(isHour, isHalf, is1Qtr, is3Qtr);
 }
 
 void WebHandlers::handleDetect() {
