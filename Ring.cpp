@@ -87,10 +87,11 @@ void Ring::getLogs() {
 }
 
 Ring::QTR Ring::calcQuarter(bool hr, bool hf, bool q1, bool q3) {
+  bool ship = settings.clock_mode == CLOCK_SHIPS;
   if (hr) return q_hr;
   if (hf) return q_hf;
-  if (q1) return q_q1;
-  if (q3) return q_q3;
+  if (q1 && !ship) return q_q1;  // no ship's on 1st qtr
+  if (q3 && !ship) return q_q3;  // no ship's on 3rd qtr
   return q_no;
 }
 
