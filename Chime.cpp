@@ -35,15 +35,24 @@ int westHf[] = {B, D, C, A, Chime::PAUSE, B, C, D, B, Chime::END};
 int westQ3[] = {D, B, C, A, Chime::PAUSE, A, C, D, B, Chime::PAUSE, D, C, B, A, Chime::END};
 int westHr[] = {B, D, C, A, Chime::PAUSE, B, C, D, B, Chime::PAUSE, D, B, C, A, Chime::PAUSE, A, C, D, B, Chime::END};
 // Pair of chimes for Hour chiming
-int westHrStrk[] = {B, A};
+int westHrStrk[] = {A, B};
 
 // 3 bell chime on quarters
-int qrtQ1[] = {C, C, Chime::PAUSE, A, Chime::END};
-int qrtHf[] = {B, B, Chime::PAUSE, A, C, Chime::END};
-int qrtQ3[] = {A, A, Chime::PAUSE, C, B, C, Chime::END};
-int qrtHr[] = {C, B, C, B, A, Chime::END};
+int qrt3_Q1[] = {C, C, Chime::PAUSE, A, Chime::END};
+int qrt3_Hf[] = {B, B, Chime::PAUSE, A, C, Chime::END};
+int qrt3_Q3[] = {A, A, Chime::PAUSE, C, B, C, Chime::END};
+int qrt3_Hr[] = {C, B, C, B, A, Chime::END};
 // Pair of chimes for Hour chiming
-int qrtHrStrk[] = {C, A};
+int qrt3_HrStrk[] = {A, C};
+
+// 2 bell chime on quarters
+int qrt2_Q1[] = {B, A, Chime::END};
+int qrt2_Hf[] = {A, B, A, Chime::END};
+int qrt2_Q3[] = {B, A, B, Chime::END};
+int qrt2_Hr[] = {B, A, A, B, Chime::END};
+// Pair of chimes for Hour chiming
+int qrt2_HrStrk[] = {A, B};
+
 
 // Single on half, double on hour
 int halfMHf[] = {B, Chime::END};
@@ -75,20 +84,33 @@ Chime Chime::westminster() {
   return res;
 }
 
-Chime Chime::quarters() {
+Chime Chime::quarters_3() {
   Chime res;
-  res.Q1 = qrtQ1;
-  res.Hf = qrtHf;
-  res.Q3 = qrtQ3;
-  res.Hr = qrtHr;
+  res.Q1 = qrt3_Q1;
+  res.Hf = qrt3_Hf;
+  res.Q3 = qrt3_Q3;
+  res.Hr = qrt3_Hr;
   res.strikePeriod = 0.7;
-  res.strikeHr = qrtHrStrk;
+  res.strikeHr = qrt3_HrStrk;
   res.strikeHrLen = 2;
   res.strikeHrPeriod = 0.9;
   return res;
 }
 
-Chime Chime::halfsMulti() {
+Chime Chime::quarters_2() {
+  Chime res;
+  res.Q1 = qrt2_Q1;
+  res.Hf = qrt2_Hf;
+  res.Q3 = qrt2_Q3;
+  res.Hr = qrt2_Hr;
+  res.strikePeriod = 0.7;
+  res.strikeHr = qrt2_HrStrk;
+  res.strikeHrLen = 2;
+  res.strikeHrPeriod = 0.9;
+  return res;
+}
+
+Chime Chime::halfs_3() {
   Chime res;
   res.Q1 = NULL;
   res.Hf = halfMHf;
@@ -101,7 +123,7 @@ Chime Chime::halfsMulti() {
   return res;
 }
 
-Chime Chime::halfsSingle() {
+Chime Chime::halfs_1_2() {
   Chime res;
   res.Q1 = NULL;
   res.Hf = halfSHf;

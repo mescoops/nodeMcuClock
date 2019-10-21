@@ -20,9 +20,10 @@ class Chime {
     float strikeHrPeriod;
 
     static Chime westminster();
-    static Chime quarters();
-    static Chime halfsMulti();
-    static Chime halfsSingle();
+    static Chime quarters_3();
+    static Chime quarters_2();
+    static Chime halfs_3();
+    static Chime halfs_1_2();
     static Chime hours();
 
     static int shipBase[];

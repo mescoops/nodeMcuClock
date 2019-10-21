@@ -8,12 +8,13 @@
 #include "Settings.h"
 #include "RemoteDebug.h"
 
-#define CLOCK_SHIPS         5
-#define CLOCK_WESTM         4
-#define CLOCK_ALL           3
-#define CLOCK_HALF_MULTI    2
-#define CLOCK_HALF_SINGLE   1
 #define CLOCK_HOUR          0
+#define CLOCK_HALF_1_2      1
+#define CLOCK_HALF_3        2
+#define CLOCK_ALL_2         3
+#define CLOCK_ALL_3         4
+#define CLOCK_WESTM         5
+#define CLOCK_SHIPS         6
 
 class Ring {
   public:
@@ -25,6 +26,7 @@ class Ring {
     void getLogs();
     String logs[12];
     String logExtra;
+    String logExtra2;
     void printdbg();
     void printdbgLog();
     enum QTR { q_no, q_q1, q_hf, q_q3, q_hr };

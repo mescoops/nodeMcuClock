@@ -7,9 +7,10 @@
 
 
 Chime westminster = Chime::westminster();
-Chime quarters    = Chime::quarters();
-Chime halfsMulti  = Chime::halfsMulti();
-Chime halfsSingle = Chime::halfsSingle();
+Chime quarters_2  = Chime::quarters_2();
+Chime quarters_3  = Chime::quarters_3();
+Chime halfs_3     = Chime::halfs_3();
+Chime halfs_1_2   = Chime::halfs_1_2();
 Chime hours       = Chime::hours();
 
 Chime chime;
@@ -42,6 +43,7 @@ Ring::Ring(Mute &m, Settings &s, RemoteDebug &d) : mute(m), settings(s), Debug(d
   for (int i=0; i<12; i++)
      logs[i] = "OK";
   logExtra = "Start";
+  logExtra2 = "Sec "+second();
 }
 
 void Ring::printdbg() {
@@ -81,6 +83,7 @@ void Ring::getLogs() {
   for (int i=0; i<12; i++)
      Debug.println(logs[i]);
   Debug.println(logExtra);
+  Debug.println(logExtra2);
 }
 
 Ring::QTR Ring::calcQuarter(bool hr, bool hf, bool q1, bool q3) {
@@ -93,8 +96,8 @@ Ring::QTR Ring::calcQuarter(bool hr, bool hf, bool q1, bool q3) {
 
 String toString(Ring::QTR v) {
     switch (v) {
-        case Ring::q_hr:   return "q_hr";
-        case Ring::q_hf:   return "q_hf";
+        case Ring::q_hr: return "q_hr";
+        case Ring::q_hf: return "q_hf";
         case Ring::q_q1: return "q_q1";
         case Ring::q_q3: return "q_q3";
         default:      return "qqq";
@@ -103,8 +106,10 @@ String toString(Ring::QTR v) {
 
 Ring::QTR Ring::calcQuarter() {
   int mins = minute();
-  //logExtra = String(" Check ")+currQuarter+"  "+mins;
-  return calcQuarter(mins==0, mins==30, mins==15, mins==45);
+  int secs = second();
+  QTR q = calcQuarter(mins==0, mins==30, mins==15, mins==45);
+  logExtra2 = String(" Calc Qtr ")+toString(q)+"  "+mins+":"+secs;
+  return q;
 }
 
 // called every 60 seconds
@@ -144,11 +149,12 @@ void Ring::checkForRing() {
 }
 
 void setChimes(int t) {
-  if (t == CLOCK_WESTM)       chime = westminster;
-  if (t == CLOCK_ALL)         chime = quarters;
-  if (t == CLOCK_HALF_MULTI)  chime = halfsMulti;
-  if (t == CLOCK_HALF_SINGLE) chime = halfsSingle;
   if (t == CLOCK_HOUR)        chime = hours;
+  if (t == CLOCK_HALF_1_2)    chime = halfs_1_2;
+  if (t == CLOCK_HALF_3)      chime = halfs_3;
+  if (t == CLOCK_ALL_2)       chime = quarters_2;
+  if (t == CLOCK_ALL_3)       chime = quarters_3;
+  if (t == CLOCK_WESTM)       chime = westminster;
 }
 
 void Ring::testRing(bool hr, bool hf, bool q1, bool q3) {
