@@ -5,7 +5,7 @@
 
 // Time for solenoid activation
 #define SOLEN_TIME   0.05
-#define SOLEN_TIME_2 0.08
+#define SOLEN_TIME_2 0.05
 
 Ticker toggle;
 

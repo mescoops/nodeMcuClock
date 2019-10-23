@@ -54,6 +54,8 @@ int qrt2_Hr[] = {B, A, A, B, Chime::END};
 int qrt2_HrStrk[] = {A, B};
 
 
+int null_ch[] = {Chime::END};
+
 // Single on half, double on hour
 int halfMHf[] = {B, Chime::END};
 int halfMHrStrk[] = {A, C};
@@ -112,10 +114,10 @@ Chime Chime::quarters_2() {
 
 Chime Chime::halfs_3() {
   Chime res;
-  res.Q1 = NULL;
+  res.Q1 = null_ch;
   res.Hf = halfMHf;
-  res.Q3 = NULL;
-  res.Hr = NULL;
+  res.Q3 = null_ch;
+  res.Hr = null_ch;
   res.strikePeriod = 0.7;
   res.strikeHr = halfMHrStrk;
   res.strikeHrLen = 2;
@@ -125,10 +127,10 @@ Chime Chime::halfs_3() {
 
 Chime Chime::halfs_1_2() {
   Chime res;
-  res.Q1 = NULL;
+  res.Q1 = null_ch;
   res.Hf = halfSHf;
-  res.Q3 = NULL;
-  res.Hr = NULL;
+  res.Q3 = null_ch;
+  res.Hr = null_ch;
   res.strikePeriod = 0.7;
   res.strikeHr = halfSHrStrk;
   res.strikeHrLen = 2;
@@ -138,10 +140,10 @@ Chime Chime::halfs_1_2() {
 
 Chime Chime::hours() {
   Chime res;
-  res.Q1 = NULL;
-  res.Hf = NULL;
-  res.Q3 = NULL;
-  res.Hr = NULL;
+  res.Q1 = null_ch;
+  res.Hf = null_ch;
+  res.Q3 = null_ch;
+  res.Hr = null_ch;
   res.strikePeriod = 0.0;
   res.strikeHr = hourHrStrk;
   res.strikeHrLen = 2;
@@ -150,5 +152,5 @@ Chime Chime::hours() {
 }
 
 String Chime::toString() {
-  return String(" q1 ") + (Q1 != NULL) + "  hf " + (Hf != NULL) + "  q3 " + (Q3 != NULL) + "  hr "+(Hr != NULL);
+  return String(" q1 ") + (Q1 != null_ch) + "  hf " + (Hf != null_ch) + "  q3 " + (Q3 != null_ch) + "  hr "+(Hr != null_ch);
 }
