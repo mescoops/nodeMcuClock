@@ -214,6 +214,7 @@ void Ring::play(int p[]) {
 // Play this list of notes
 // List should end with END
 void Ring::play(int p[], float period) {
+  instance->Debug.println("play");
   if (p==NULL) return;
   pIdx = 0;
   pList = p;
@@ -232,9 +233,9 @@ void Ring::play(int p[], float period) {
 }
 
 void Ring::ding() {
-  //instance->Debug.print("Ding ");
-  //instance->Debug.print(pIdx);
-  //instance->Debug.print(" ");
+  instance->Debug.print("Ding ");
+  instance->Debug.print(pIdx);
+  instance->Debug.print(" ");
   // Check if we are at last in list
   if (pIdx>=pLen) {
     ringer.detach();
@@ -248,8 +249,8 @@ void Ring::ding() {
         isRinging = false;
   } else {
     // Play current selected note in list
-    //instance->Debug.print("Chime ");
-    //instance->Debug.println(Chime::bellToChar(pList[pIdx]));
+    instance->Debug.print("Chime ");
+    instance->Debug.println(Chime::bellToChar(pList[pIdx]));
     if (instance->mute.dynMute==0) // maybe someone pressed mute?
       actuator.play(pList[pIdx]);
     pIdx++;
@@ -269,14 +270,17 @@ void delay1() {
 }
 
 void playHour(int h) {
+  instance->Debug.print("play hour ");
+  instance->Debug.println(h);
   instance->logs[h-1] = String(h)+" ";
   hourCount = h;
-  delCount = 2;
-  if (instance->settings.clock_mode == CLOCK_HOUR)
+  if (instance->settings.clock_mode == CLOCK_HOUR || instance->settings.clock_mode == CLOCK_HALF_1_2)
     // just play hour, so play it right away
     ringer.attach(chime.strikeHrPeriod, hourDing);
-  else
+  else {
+    delCount = 2;
     ringer.attach(chime.strikeHrPeriod, delay1);
+  }
 }
 
 
@@ -290,4 +294,22 @@ void hourDing() {
       actuator.play(chime.strikeHr, chime.strikeHrLen);
     hourCount--;
   }
+}
+
+void Ring::ringList(String l) {
+  // after '&' split list on commas
+  int list[8];  
+  char* inp = const_cast<char*>(l.c_str());
+  char* separatorAmp = strchr(inp, '&');
+  ++separatorAmp;
+  // Read each value
+  char* v = strtok(separatorAmp, ",");
+  int len = 0;
+  while (v != 0) {
+    list[len] = atoi(v);
+    len++;
+    // Find the next val
+    v = strtok(0, ",");
+  }
+  actuator.play(list, len);
 }

@@ -21,6 +21,7 @@ class Ring {
     Ring(Mute &m, Settings &s, RemoteDebug &d);
     void checkForRing();
     void testRing(bool hr, bool hf, bool q1, bool q3);
+    void ringList(String l); // comma separated ints
     Mute &mute;
     Settings &settings;
     void getLogs();
