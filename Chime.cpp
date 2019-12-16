@@ -70,7 +70,7 @@ int hourHrStrk[] = {A, B};
 
 // Ship's
 int Chime::shipBase[] = {A, A, Chime::PAUSE, A, A, Chime::PAUSE, A, A, Chime::PAUSE, A, A, Chime::END};
-float Chime::shipChPeriod = 0.5;
+float Chime::shipChPeriod = 0.75;
 
 
 Chime Chime::westminster() {
