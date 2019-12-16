@@ -62,14 +62,22 @@ void setupClockCheck() {
   int secs = second();
   if ((secs % 60)==0) {
     mainTicker.detach();
-    // Check every 5 seconds
+    // maybe we are at a quarter etc.
+    ring.checkForRing();
+    // Then start check every 60 seconds
     mainTicker.attach(60.0, checkForRing);
   }
 }
 
 // Check if we need to ring some bells
 void checkForRing() {
+  int secs = second();
 	ring.checkForRing();
+  // if we are out of sync, reset clock
+  if (secs>4) {
+    mainTicker.detach();
+    mainTicker.attach(0.5, setupClockCheck);
+  }
 }
 
 ////////////////////////////////////////////
@@ -163,7 +171,7 @@ void setup() {
 
 	delay(SERVER_STARTUP_DELAY);
 
-  // Find next 5th second, then start clock
+  // Find next 0th second, then start clock
   mainTicker.attach(0.5, setupClockCheck);
 }
 
