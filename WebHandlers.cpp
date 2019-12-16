@@ -87,6 +87,7 @@ bool WebHandlers::handleFileRead(String path) { // send the right file to the cl
 	bool rstMute  = path.indexOf("RSTMUTE")>0;
 	bool lastSync = path.indexOf("LASTSYNC")>0;
   bool syncNow  = path.indexOf("SYNCNow")>0;
+  bool play     = path.indexOf("PLAY")>0;
 	String contentType = getContentType(path);            // Get the MIME type
   if (!curTime)
     Serial.println("handleFileRead: " + path);
@@ -127,6 +128,9 @@ bool WebHandlers::handleFileRead(String path) { // send the right file to the cl
 		return true;
   } else if (syncNow) {
     handleSyncNow();
+    return true;
+  } else if (play) {
+    handlePlay(path);
     return true;
 	}
 	Serial.println("\tFile Not Found");
@@ -197,4 +201,11 @@ void WebHandlers::handleSyncNow() {
   NetTime::getTime();
   server.send(200, "text/plain", "Sync ok");
   Serial.println("Sync Now");
+}
+
+void WebHandlers::handlePlay(String t) {
+  Serial.println("Play");
+  Serial.println(t);
+  ring.ringList(t);
+  server.send(200, "text/plain", "ok");
 }

@@ -31,6 +31,7 @@ private:
 	void handleLastSync();
   void handleSyncNow();
 	void handleValues();
+  void handlePlay(String l);
   static void handleMuteMore();
   static void handleResetMute();
 };
