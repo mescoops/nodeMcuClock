@@ -11,9 +11,9 @@
 		<img src=Bell.png width=40 style="display: inline" />
 		<h1 style="display: inline">Scoops' Clock</h1>
 	</div>
-          <h4><span id=clock_name>CCC</span></h4>
+          <div class="txt_med"><span id=clock_name>CCC</span></div>
+          <div class="txt_med">Time: <span id=curr_time>RRR</span></div>
           <div class="txt_med">IP Addr: <span id=clock_ip>BBB</span></div>
-          <div class="txt_small">Curr: <span id=curr_time>RRR</span><br>Last Sync: <span id=last_sync>AAA</span></div>
 			<div id="mute_controls" style="display: block; border: 1px solid rgb(68, 68, 68); padding: 5px; margin: 5px; width: 160px; background-color: rgb(238, 238, 238);">
 				<div>Muting</div>
 			    <input type="checkbox" name="mute_enab" id="mute_enab"> Enable <br>
@@ -63,7 +63,7 @@
 						&nbsp;<span class="txt_med"><button id="MR-btn" class="btn btn--s btn--blue">Reset</button>
 					<br><span id="clock_mute" class="txt_med_red">&nbsp;</span></span>
 				</div>
-			<hr style="height:2px; visibility:hidden;" />
+        <div><button id="SV-btn" style="width:150px" class="btn btn--m btn--blue">Save</button></td></div>
 			<div>Mode</div>
 			<select name="clock_mode" id="clock_mode">
               <option value="0">Hour Only 1-2</option>
@@ -115,16 +115,16 @@
 			<input type="checkbox" name="time_dst" id="time_dst"> Summer Time
 			<hr style="height:2px; visibility:hidden;" />
 			NTP Server <input type="text" name="ntp_server" id="ntp_server" value="pool.ntp.org">
-			<button id="SY-btn" class="btn btn--s btn--blue">Sync</button><br>
-        <div>
-			<br><button id="SV-btn" style="width:150px" class="btn btn--m btn--blue">Save</button></td>
-		</div>
+			<button id="SY-btn" class="btn btn--s btn--blue">Sync</button>
+            <div class="txt_small">Last Sync: <span id=last_sync>AAA</span></div>
+			<br>
 	<div>
 		<button id="Q1-btn" class="btn btn--s btn--blue">Test Q1</button>
 		<button id="HF-btn" class="btn btn--s btn--blue">Test Half</button>
 		<button id="Q3-btn" class="btn btn--s btn--blue">Test Q3</button>
 		<button id="HR-btn" class="btn btn--s btn--blue">Test Hour</button>
 	</div>
+          <div class="txt_small">Software: <span id=clock_software>SSS</span></div>
   </div>
 	<script>
 		updateMuteTime();

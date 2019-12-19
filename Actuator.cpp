@@ -4,8 +4,8 @@
 #include "Actuator.h"
 
 // Time for solenoid activation
-#define SOLEN_TIME   0.05
-#define SOLEN_TIME_2 0.05
+#define SOLEN_TIME   0.25
+#define SOLEN_TIME_2 0.25
 
 Ticker toggle;
 

@@ -83,8 +83,11 @@ bool Settings::saveConfig() {
 	return true;
 }
 
+const char compile_date[] = __DATE__; //" " __TIME__;
+
 String Settings::getValues() {
 	String values = "";
+  values += "clock_software|" + (String)compile_date + "|span\n";
 	values += "clock_ip|"   + (String)id.myIP + "|span\n";
 	values += "clock_name|" + (String)id.clientMac+".local" + "|span\n";
 	values += "last_sync|"  + NTP.getTimeDateString(NTP.getLastNTPSync()) + "|span\n";

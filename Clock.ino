@@ -56,6 +56,16 @@ void configModeCallback (WiFiManager *myWiFiManager) {
 	LED::blink(0.2);
 }
 
+// Check if we need to ring some bells
+void checkForRing() {
+  int secs = second();
+  ring.checkForRing();
+  // if we are out of sync, reset clock
+  if (secs>4) {
+    mainTicker.detach();
+    mainTicker.attach(0.5, setupClockCheck);
+  }
+}
 
 // line up ticker to 0th second
 void setupClockCheck() {
@@ -69,16 +79,6 @@ void setupClockCheck() {
   }
 }
 
-// Check if we need to ring some bells
-void checkForRing() {
-  int secs = second();
-	ring.checkForRing();
-  // if we are out of sync, reset clock
-  if (secs>4) {
-    mainTicker.detach();
-    mainTicker.attach(0.5, setupClockCheck);
-  }
-}
 
 ////////////////////////////////////////////
 
