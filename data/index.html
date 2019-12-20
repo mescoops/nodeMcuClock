@@ -11,9 +11,20 @@
 		<img src=Bell.png width=40 style="display: inline" />
 		<h1 style="display: inline">Scoops' Clock</h1>
 	</div>
-          <div class="txt_med"><span id=clock_name>CCC</span></div>
-          <div class="txt_med">Time: <span id=curr_time>RRR</span></div>
-          <div class="txt_med">IP Addr: <span id=clock_ip>BBB</span></div>
+    <table>
+		<tr>
+			<td class="left-column">Time:</td>
+            <td><b><div class="txt_med" id=curr_time>CCC</div></b></td>
+        </tr>
+		<tr>
+			<td class="left-column">ID:</td>
+            <td><b><div class="txt_med" id=clock_name>CCC</div></b></td>
+        </tr>
+		<tr>
+			<td class="left-column">IP Addr:</td>
+            <td><b><div class="txt_med" id=clock_ip>CCC</div></b></td>
+        </tr>
+    </table>
 			<div id="mute_controls" style="display: block; border: 1px solid rgb(68, 68, 68); padding: 5px; margin: 5px; width: 160px; background-color: rgb(238, 238, 238);">
 				<div>Muting</div>
 			    <input type="checkbox" name="mute_enab" id="mute_enab"> Enable <br>
@@ -124,9 +135,13 @@
 		<button id="Q3-btn" class="btn btn--s btn--blue">Test Q3</button>
 		<button id="HR-btn" class="btn btn--s btn--blue">Test Hour</button>
 	</div>
-          <div class="txt_small">Software: <span id=clock_software>SSS</span></div>
+          <div class="txt_small">Software: <span id=clock_software_id>SSS</span> <span id=clock_software>SSS</span></div>
   </div>
 	<script>
+	document.getElementById("curr_time").textContent="tttt";
+document.getElementById("clock_name").textContent="nnnn";
+document.getElementById("clock_ip").textContent="ipipipipipipi";
+
 		updateMuteTime();
 		setInterval(updateStuff, 1*60*1000); // Minutes
 		setInterval(updateSecs, 1000); // Seconds
@@ -153,6 +168,7 @@
 			updateMuteTime();
 		});
 		window.onload = function () {
+			load("revision.js","js");
 			load("style.css","css", function() {
 				load("microajax.js","js", function() {
 					setValues("/values");
