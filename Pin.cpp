@@ -2,11 +2,9 @@
 #include "Pin.h"
 #include "Chime.h"
 
-// Time for solenoid activation
-#define SOLEN_TIME   400  // ms
-
 bool toggleStarted = false;
 Ticker toggleTicker;
+int Pin::solenoidHoldTime;
 
 Pin::Pin(int p) {
   pin = p;
@@ -57,9 +55,9 @@ void Pin::toggle() {
     digitalWrite(pin, 1);    // set pin on
   started = millis();
   startToggle();
-  Serial.print("pin ");
-  Serial.print(pin);
-  Serial.println(" On");
+//  Serial.print("pin ");
+//  Serial.print(pin);
+//  Serial.println(" On");
 }
 
 void Pin::off() {
@@ -72,7 +70,7 @@ void Pin::off() {
 
 bool Pin::isOver() {
   unsigned long n = millis();
-  return started && started+SOLEN_TIME < n;
+  return started && started+solenoidHoldTime < n;
 }
 
 Pin * Pin::findPin(int p) {

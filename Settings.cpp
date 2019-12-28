@@ -3,6 +3,7 @@
 #include <FS.h>
 #include <ArduinoJson.h>
 #include "Settings.h"
+#include "Pin.h"
 
 Settings::Settings(Mute &m, ID &i) : mute(m), id(i){ }
 
@@ -31,10 +32,11 @@ bool Settings::loadConfig() {
 }
 
 bool Settings::getDataFromJson(const char* buf) {
-  StaticJsonDocument<200> json;
+  StaticJsonDocument<250> json;
   DeserializationError err = deserializeJson(json, buf);
 	if (err) {
 		Serial.println("Failed to parse config file");
+    Serial.println(err.c_str());
 		return false;
 	}
 
@@ -49,6 +51,8 @@ bool Settings::getDataFromJson(const char* buf) {
 	mute.mute_start = json["mute_start"];
 	mute.mute_end   = json["mute_end"];
 
+  Pin::solenoidHoldTime = json["sol_hold"];
+
 	Serial.println("Loaded config");
   Serial.print("     tz "); Serial.println(time_tz);
 	Serial.print("    dst "); Serial.println(time_dst);
@@ -58,6 +62,7 @@ bool Settings::getDataFromJson(const char* buf) {
 	Serial.print("   mute "); Serial.println(mute.mute_enab);
 	Serial.print("mute st "); Serial.println(mute.mute_start);
 	Serial.print("mote en "); Serial.println(mute.mute_end);
+  Serial.print("sol hld "); Serial.println(Pin::solenoidHoldTime);
 
 	return true;
 }
@@ -71,6 +76,7 @@ bool Settings::saveConfig() {
 	json["mute"]       = (mute.mute_enab?1:0);
 	json["mute_start"] = mute.mute_start;
 	json["mute_end"]   = mute.mute_end;
+  json["sol_hold"]   = Pin::solenoidHoldTime;
 
 	File configFile = SPIFFS.open("/config.json", "w");
 	if (!configFile) {
@@ -98,6 +104,7 @@ String Settings::getValues() {
 	values += "mute_enab|"  + (String)(mute.mute_enab ? "checked" : "") + "|chk\n";
 	values += "mute_start|" + (String)mute.mute_start + "|input\n";
 	values += "mute_end|"   + (String)mute.mute_end + "|input\n";
+  values += "sol_hold|"   + (String)Pin::solenoidHoldTime + "|input\n";
 	values += "clock_mute|Mute "+(mute.dynMute>0?"Ends: "+(String)(mute.dynMute/60):"Off") + "|span\n";
 	Serial.print("Values: ");
 	Serial.println(values);

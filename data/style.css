@@ -47,7 +47,8 @@ hr {
 }
 
 .btn--m {
-    font-size: 14px;
+    font-size: 11px;
+	font-weight: bold;
 }
 
 .btn--l {
@@ -79,6 +80,10 @@ hr {
     color: #fff;
     background-color: #001F3F;
     border-color: #001F3F;
+}
+
+.br_small {
+	font-size: 4px;
 }
 
 .txt_small {

@@ -17,6 +17,8 @@ public:
   static Pin * findOverPin(); 
   static bool anyActivePin();
   static int getPin(int i); 
+  // Time for solenoid activation - ms
+  static int solenoidHoldTime;
 private:
   bool isOver();
   int currState;
