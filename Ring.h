@@ -41,8 +41,8 @@ class Ring {
     bool doRing();
     bool doRingShips();
     int findHrType();
-    void play(int p[], float period);
-    void play(int p[]);
+    void play(const int p[], float period);
+    void play(const int p[]);
     static void ding();
 };
 

@@ -11,6 +11,7 @@
 #include "NetTime.h"
 #include "LED.h"
 #include "RemoteDebug.h"
+#include "Chime.h"
 
 // Delay when staring to check if you press the reset button
 // Gives you time to power clock up and then find the button and press it
@@ -93,23 +94,6 @@ void setup() {
   LED::setupLED();
 	// set reset pin as input
 	pinMode(RESET_PIN, INPUT_PULLUP);
-
-	// set ringer pins
-	pinMode(BELL_A_PIN, OUTPUT);
-	pinMode(BELL_B_PIN, OUTPUT);
-	pinMode(BELL_C_PIN, OUTPUT);
-	pinMode(BELL_D_PIN, OUTPUT);
-	pinMode(BELL_E_PIN, OUTPUT);
-	pinMode(BELL_F_PIN, OUTPUT);
-	pinMode(BELL_G_PIN, OUTPUT);
-
-	digitalWrite(BELL_A_PIN, 0);
-	digitalWrite(BELL_B_PIN, 0);
-	digitalWrite(BELL_C_PIN, 0);
-	digitalWrite(BELL_D_PIN, 0);
-	digitalWrite(BELL_E_PIN, 0);
-	digitalWrite(BELL_F_PIN, 0);
-	digitalWrite(BELL_G_PIN, 0);
 
 	WiFiManager wifiManager;
 

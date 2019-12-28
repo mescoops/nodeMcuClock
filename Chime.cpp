@@ -1,17 +1,30 @@
 #include <Arduino.h>
 #include "Chime.h"
-#include "PinDefs.h"
+#include "Pin.h"
 
-int A = BELL_A_PIN;
-int B = BELL_B_PIN;
-int C = BELL_C_PIN;
-int D = BELL_D_PIN;
-int E = BELL_E_PIN;
-int F = BELL_F_PIN;
-int G = BELL_G_PIN;
+constexpr int Chime::null_ch[];
+constexpr int Chime::halfSHf[];
+constexpr int Chime::hourHrStrk[];
+constexpr int Chime::halfMHf[];
+constexpr int Chime::halfSHrStrk[];
+constexpr int Chime::westQ1[];
+constexpr int Chime::westHf[];
+constexpr int Chime::westQ3[];
+constexpr int Chime::westHr[];
+constexpr int Chime::westHrStrk[];
+constexpr int Chime::qrt3_Q1[];
+constexpr int Chime::qrt3_Hf[];
+constexpr int Chime::qrt3_Q3[];
+constexpr int Chime::qrt3_Hr[];
+constexpr int Chime::qrt3_HrStrk[];
+constexpr int Chime::qrt2_Q1[];
+constexpr int Chime::qrt2_Hf[];
+constexpr int Chime::qrt2_Q3[];
+constexpr int Chime::qrt2_Hr[];
+constexpr int Chime::qrt2_HrStrk[];
+constexpr int Chime::halfMHrStrk[];
+constexpr int Chime::shipBase[];
 
-int Chime::END = -100;
-int Chime::PAUSE = -1;
 
 char Chime::bellToChar(int b) {
   if (b == A) return 'A';
@@ -26,51 +39,6 @@ char Chime::bellToChar(int b) {
   return '?';
 }
 
-//////////////////////////////////
-// Westminster
-// G♯4, F♯4, E4, B3
-// D    C    B   A
-int westQ1[] = {D, C, B, A, Chime::END};
-int westHf[] = {B, D, C, A, Chime::PAUSE, B, C, D, B, Chime::END};
-int westQ3[] = {D, B, C, A, Chime::PAUSE, A, C, D, B, Chime::PAUSE, D, C, B, A, Chime::END};
-int westHr[] = {B, D, C, A, Chime::PAUSE, B, C, D, B, Chime::PAUSE, D, B, C, A, Chime::PAUSE, A, C, D, B, Chime::END};
-// Pair of chimes for Hour chiming
-int westHrStrk[] = {A, B};
-
-// 3 bell chime on quarters
-int qrt3_Q1[] = {C, C, Chime::PAUSE, A, Chime::END};
-int qrt3_Hf[] = {B, B, Chime::PAUSE, A, C, Chime::END};
-int qrt3_Q3[] = {A, A, Chime::PAUSE, C, B, C, Chime::END};
-int qrt3_Hr[] = {C, B, C, B, A, Chime::END};
-// Pair of chimes for Hour chiming
-int qrt3_HrStrk[] = {A, C};
-
-// 2 bell chime on quarters
-int qrt2_Q1[] = {B, A, Chime::END};
-int qrt2_Hf[] = {A, B, A, Chime::END};
-int qrt2_Q3[] = {B, A, B, Chime::END};
-int qrt2_Hr[] = {B, A, A, B, Chime::END};
-// Pair of chimes for Hour chiming
-int qrt2_HrStrk[] = {A, B};
-
-
-int null_ch[] = {Chime::END};
-
-// Single on half, double on hour
-int halfMHf[] = {B, Chime::END};
-int halfMHrStrk[] = {A, C};
-
-// Single (or double) on half, single (or double) on hour
-int halfSHf[] = {A, B, Chime::END};
-int halfSHrStrk[] = {A, B};
-
-// Single (or double) on hour
-int hourHrStrk[] = {A, B};
-
-
-// Ship's
-int Chime::shipBase[] = {A, A, Chime::PAUSE, A, A, Chime::PAUSE, A, A, Chime::PAUSE, A, A, Chime::END};
-float Chime::shipChPeriod = 0.75;
 
 
 Chime Chime::westminster() {

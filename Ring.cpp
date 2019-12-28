@@ -23,7 +23,7 @@ int listShip[12];
 ////////////////////////////////
 
 int pIdx = 0;
-int *pList;
+const int *pList;
 int pLen = 0;
 Ticker ringer;
 bool isRinging = false;
@@ -207,13 +207,13 @@ bool Ring::doRingShips() {
 }
 
 
-void Ring::play(int p[]) {
+void Ring::play(const int p[]) {
   play(p, chime.strikePeriod);
 }
 
 // Play this list of notes
 // List should end with END
-void Ring::play(int p[], float period) {
+void Ring::play(const int p[], float period) {
   instance->Debug.println("play");
   if (p==NULL) return;
   pIdx = 0;
