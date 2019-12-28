@@ -57,9 +57,9 @@ void Pin::toggle() {
     digitalWrite(pin, 1);    // set pin on
   started = millis();
   startToggle();
-//  Serial.print("pin ");
-//  Serial.print(pin);
-//  Serial.println(" On");
+  Serial.print("pin ");
+  Serial.print(pin);
+  Serial.println(" On");
 }
 
 void Pin::off() {
@@ -98,4 +98,10 @@ Pin * Pin::findOverPin() {
     if (pinList[i].isOver())
       return &pinList[i];
   return &PinEND;
+}
+
+int Pin::getPin(int i) {
+  if (i<0 || i>=8)
+    i = 0;
+  return pinList[i].pin;
 }

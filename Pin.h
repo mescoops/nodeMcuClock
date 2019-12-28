@@ -16,6 +16,7 @@ public:
   static Pin * findPin(int p); 
   static Pin * findOverPin(); 
   static bool anyActivePin();
+  static int getPin(int i); 
 private:
   bool isOver();
   int currState;

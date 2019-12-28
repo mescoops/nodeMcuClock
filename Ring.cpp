@@ -4,6 +4,7 @@
 #include "Chime.h"
 #include "Ring.h"
 #include "Actuator.h"
+#include "Pin.h"
 
 
 Chime westminster = Chime::westminster();
@@ -305,8 +306,8 @@ void Ring::ringList(String l) {
   // Read each value
   char* v = strtok(separatorAmp, ",");
   int len = 0;
-  while (v != 0) {
-    list[len] = atoi(v);
+  while (v != 0 && len < 8) {
+    list[len] = Pin::getPin(atoi(v));
     len++;
     // Find the next val
     v = strtok(0, ",");
