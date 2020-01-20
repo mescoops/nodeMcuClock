@@ -66,9 +66,9 @@ class Chime {
 
     // 2 bell chime on quarters
     static constexpr int qrt2_Q1[3] = {B, A, END};
-    static constexpr int qrt2_Hf[4] = {A, B, A, END};
-    static constexpr int qrt2_Q3[4] = {B, A, B, END};
-    static constexpr int qrt2_Hr[5] = {B, A, A, B, END};
+    static constexpr int qrt2_Hf[3] = {A, A, END};
+    static constexpr int qrt2_Q3[3] = {A, B, END};
+    static constexpr int qrt2_Hr[5] = {B, A, B, A, END};
     // Pair of chimes for Hour chiming
     static constexpr int qrt2_HrStrk[2] = {A, B};
 
