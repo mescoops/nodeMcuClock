@@ -2,13 +2,10 @@
 #include "Pin.h"
 #include "Chime.h"
 
-bool toggleStarted = false;
-Ticker toggleTicker;
 int Pin::solenoidHoldTime;
 
 Pin::Pin(int p) {
   pin = p;
-  started = 0;
   realPin = (pin != Chime::PAUSE) && (pin != Chime::END);
   if (realPin) {
     pinMode(pin, OUTPUT);
@@ -16,26 +13,12 @@ Pin::Pin(int p) {
   }
 }
 
-void toggPinOff() {
-  if (!Pin::anyActivePin()) {
-    toggleTicker.detach();
-    toggleStarted = false;
-//    Serial.println("pin Off DONE");
-    return;
-  }
-  
-  Pin *p = Pin::findOverPin();
-  while (p->pin != Chime::END) {
+void toggPinOff(int pin) {
+  Pin* p = Pin::findPin(pin);
+  if (p!=NULL)
     p->off();
-    p = Pin::findOverPin();
-  }
 }
 
-void startToggle() {
-  if (toggleStarted) return;
-  toggleStarted = true;
-  toggleTicker.attach(0.01, toggPinOff);
-}
 
 Pin PinEND(Chime::END);
 
@@ -53,25 +36,22 @@ Pin pinList[] = {
 void Pin::toggle() {
   if (realPin)
     digitalWrite(pin, 1);    // set pin on
-  started = millis();
-  startToggle();
+  toggleTicker.attach_ms(solenoidHoldTime, toggPinOff, pin);
+//  Serial.print("Togle");
+//  Serial.println(solenoidHoldTime);
 //  Serial.print("pin ");
 //  Serial.print(pin);
 //  Serial.println(" On");
 }
 
 void Pin::off() {
+  toggleTicker.detach();
   digitalWrite(pin, 0);    // set pin off
-  started = 0;
 //  Serial.print("pin ");
 //  Serial.print(pin);
 //  Serial.println(" Off");
 }
 
-bool Pin::isOver() {
-  unsigned long n = millis();
-  return started && started+solenoidHoldTime < n;
-}
 
 Pin * Pin::findPin(int p) {
   //Serial.print("Find Pin ");
@@ -81,20 +61,6 @@ Pin * Pin::findPin(int p) {
       return &pinList[i];
   }
   Serial.println("Find Pin - Not Found");
-  return &PinEND;
-}
-
-bool Pin::anyActivePin() {
-  for (int i=0; i<8; i++)
-    if (pinList[i].started)
-      return true;
-  return false;
-}
-
-Pin * Pin::findOverPin() {
-  for (int i=0; i<8; i++)
-    if (pinList[i].isOver())
-      return &pinList[i];
   return &PinEND;
 }
 
