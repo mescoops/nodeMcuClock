@@ -11,8 +11,8 @@ float currFlash = 0;
 
 void blinkLED() {
   //toggle led state
-  int state = digitalRead(BUILTIN_LED);  // get the current state of GPIO1 pin
-  digitalWrite(BUILTIN_LED, !state);     // set pin to the opposite state
+  int state = digitalRead(LED::ledPin);  // get the current state of GPIO1 pin
+  digitalWrite(LED::ledPin, !state);     // set pin to the opposite state
   if (blinkCount>0) {
     blinkCount--;
     if (blinkCount==0) {
@@ -27,11 +27,11 @@ void blinkLED() {
 void flashLEDInt() {
   //flash led state
   if (ledCount==0) {
-    digitalWrite(BUILTIN_LED, LOW);    // turn on
+    digitalWrite(LED::ledPin, LOW);    // turn on
     ledCount++;
   } else {
     ledFlashTicker.detach();
-    digitalWrite(BUILTIN_LED, HIGH);     // turn off
+    digitalWrite(LED::ledPin, HIGH);     // turn off
     ledCount = 0;
   }
 }
@@ -42,29 +42,29 @@ void flashLED() {
 
 void LED::setupLED() {
     //set led pin as output
-  pinMode(BUILTIN_LED, OUTPUT);
+  pinMode(ledPin, OUTPUT);
 }
 
 void LED::blinkLong() {
   blinkCount = 2;
-  digitalWrite(BUILTIN_LED, HIGH);
+  digitalWrite(ledPin, HIGH);
   ledTicker.attach(2.0, blinkLED);
 }
 
 void LED::blinkTimes(int count) {
   blinkCount = count * 2;
-  digitalWrite(BUILTIN_LED, HIGH);
+  digitalWrite(ledPin, HIGH);
   ledTicker.attach(0.2, blinkLED);
 }
 
 void LED::blink(float rate) {
   currFlash = 0;
-  digitalWrite(BUILTIN_LED, HIGH);
+  digitalWrite(ledPin, HIGH);
   ledTicker.attach(rate, blinkLED);
 }
 
 void LED::flash(float rate) {
   currFlash = rate;
-  digitalWrite(BUILTIN_LED, HIGH);
+  digitalWrite(ledPin, HIGH);
   ledTicker.attach(rate, flashLED);
 }

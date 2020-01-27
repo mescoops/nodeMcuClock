@@ -11,6 +11,7 @@ public:
   static void blinkLong();
   static void blink(float rate);
   static void flash(float rate);
+  static const int ledPin = D0;  // or LED_BUILTIN
 private:
 };
 
