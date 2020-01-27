@@ -36,7 +36,7 @@ Pin pinList[] = {
 void Pin::toggle() {
   if (realPin)
     digitalWrite(pin, 1);    // set pin on
-  toggleTicker.attach_ms(solenoidHoldTime, toggPinOff, pin);
+  toggleTicker.once_ms(solenoidHoldTime, toggPinOff, pin);
 //  Serial.print("Togle");
 //  Serial.println(solenoidHoldTime);
 //  Serial.print("pin ");
@@ -45,7 +45,6 @@ void Pin::toggle() {
 }
 
 void Pin::off() {
-  toggleTicker.detach();
   digitalWrite(pin, 0);    // set pin off
 //  Serial.print("pin ");
 //  Serial.print(pin);

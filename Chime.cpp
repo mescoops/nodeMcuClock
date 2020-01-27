@@ -47,10 +47,10 @@ Chime Chime::westminster() {
   res.Hf = westHf;
   res.Q3 = westQ3;
   res.Hr = westHr;
-  res.strikePeriod = 1.0;
+  res.strikePeriod_ms = 1000;
   res.strikeHr = westHrStrk;
   res.strikeHrLen = 2;
-  res.strikeHrPeriod = 1.2;
+  res.strikeHrPeriod_ms = 1200;
   return res;
 }
 
@@ -60,10 +60,10 @@ Chime Chime::quarters_3() {
   res.Hf = qrt3_Hf;
   res.Q3 = qrt3_Q3;
   res.Hr = qrt3_Hr;
-  res.strikePeriod = 0.7;
+  res.strikePeriod_ms = 700;
   res.strikeHr = qrt3_HrStrk;
   res.strikeHrLen = 2;
-  res.strikeHrPeriod = 0.9;
+  res.strikeHrPeriod_ms = 900;
   return res;
 }
 
@@ -73,10 +73,10 @@ Chime Chime::quarters_2() {
   res.Hf = qrt2_Hf;
   res.Q3 = qrt2_Q3;
   res.Hr = qrt2_Hr;
-  res.strikePeriod = 0.7;
+  res.strikePeriod_ms = 700;
   res.strikeHr = qrt2_HrStrk;
   res.strikeHrLen = 2;
-  res.strikeHrPeriod = 0.9;
+  res.strikeHrPeriod_ms = 900;
   return res;
 }
 
@@ -86,10 +86,10 @@ Chime Chime::halfs_3() {
   res.Hf = halfMHf;
   res.Q3 = null_ch;
   res.Hr = null_ch;
-  res.strikePeriod = 0.7;
+  res.strikePeriod_ms = 700;
   res.strikeHr = halfMHrStrk;
   res.strikeHrLen = 2;
-  res.strikeHrPeriod = 0.9;
+  res.strikeHrPeriod_ms = 900;
   return res;
 }
 
@@ -99,10 +99,10 @@ Chime Chime::halfs_1_2() {
   res.Hf = halfSHf;
   res.Q3 = null_ch;
   res.Hr = null_ch;
-  res.strikePeriod = 0.7;
+  res.strikePeriod_ms = 700;
   res.strikeHr = halfSHrStrk;
   res.strikeHrLen = 2;
-  res.strikeHrPeriod = 0.9;
+  res.strikeHrPeriod_ms = 900;
   return res;
 }
 
@@ -112,10 +112,10 @@ Chime Chime::hours() {
   res.Hf = null_ch;
   res.Q3 = null_ch;
   res.Hr = null_ch;
-  res.strikePeriod = 0.0;
+  res.strikePeriod_ms = 0;
   res.strikeHr = hourHrStrk;
   res.strikeHrLen = 2;
-  res.strikeHrPeriod = 0.9;
+  res.strikeHrPeriod_ms = 900;
   return res;
 }
 

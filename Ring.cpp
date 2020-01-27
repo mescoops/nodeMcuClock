@@ -203,18 +203,18 @@ void findShipRing() {
 
 bool Ring::doRingShips() {
   findShipRing();
-  play(listShip, Chime::shipChPeriod);
+  play(listShip, Chime::shipChPeriod_ms);
   return true;
 }
 
 
 void Ring::play(const int p[]) {
-  play(p, chime.strikePeriod);
+  play(p, chime.strikePeriod_ms);
 }
 
 // Play this list of notes
 // List should end with END
-void Ring::play(const int p[], float period) {
+void Ring::play(const int p[], long period_ms) {
   instance->Debug.println("play");
   if (p==NULL) return;
   pIdx = 0;
@@ -230,7 +230,7 @@ void Ring::play(const int p[], float period) {
   //Serial.print("Play Len ");
   //Serialx.println(ll);
   // Play list items at intervals
-  ringer.attach(period, ding);
+  ringer.attach_ms(period_ms, ding);
 }
 
 void Ring::ding() {
@@ -266,7 +266,7 @@ void delay1() {
       // make delay by no ringing first time
       ringer.detach();
       // after delay, play hour notes
-      ringer.attach(chime.strikeHrPeriod, hourDing);
+      ringer.attach_ms(chime.strikeHrPeriod_ms, hourDing);
     }
 }
 
@@ -277,10 +277,10 @@ void playHour(int h) {
   hourCount = h;
   if (instance->settings.clock_mode == CLOCK_HOUR || instance->settings.clock_mode == CLOCK_HALF_1_2)
     // just play hour, so play it right away
-    ringer.attach(chime.strikeHrPeriod, hourDing);
+    ringer.attach_ms(chime.strikeHrPeriod_ms, hourDing);
   else {
     delCount = 2;
-    ringer.attach(chime.strikeHrPeriod, delay1);
+    ringer.attach_ms(chime.strikeHrPeriod_ms, delay1);
   }
 }
 

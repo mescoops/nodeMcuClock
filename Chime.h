@@ -24,11 +24,11 @@ class Chime {
     const int *Hf;
     const int *Q3;
     const int *Hr;
-    float strikePeriod;
+    long strikePeriod_ms;
 
     const int *strikeHr;
     int strikeHrLen;
-    float strikeHrPeriod;
+    long strikeHrPeriod_ms;
 
     static Chime westminster();
     static Chime quarters_3();
@@ -41,7 +41,7 @@ class Chime {
 
     // Ship's
     static constexpr int shipBase[12] = {A, A, PAUSE, A, A, PAUSE, A, A, PAUSE, A, A, END};
-    static constexpr float shipChPeriod = 0.75;
+    static constexpr float shipChPeriod_ms = 750;
     
     String toString();    
   private:
