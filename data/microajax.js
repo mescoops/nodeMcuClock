@@ -1,10 +1,10 @@
-function microAjax(B,A){
-    this.bindFunction=function(E,D) {
-        return function() {
-            return E.apply(D,[D]);
+function microAjax(B, A) {
+    this.bindFunction = function (E, D) {
+        return function () {
+            return E.apply(D, [D]);
         };
     };
-    this.stateChange=function(D) {
+    this.stateChange = function (D) {
         if (this.request.readyState == 4) {
             this.callbackFunction(this.request.responseText);
         }
@@ -37,22 +37,27 @@ function microAjax(B,A){
     }
 }
 
-function setValues(url)
-{
-	microAjax(url, function (res) {
-	    res.split(String.fromCharCode(10)).forEach(
+function setValues(url) {
+    microAjax(url, function (res) {
+        res.split(String.fromCharCode(10)).forEach(
             function (entry) {
-		        fields = entry.split("|");
-		        if(fields[2] == "input") {
-				    document.getElementById(fields[0]).value = fields[1];
-		        } else if(fields[2] == "div") {
-				    document.getElementById(fields[0]).innerHTML  = fields[1];
-		        } else if(fields[2] == "span") {
-				    document.getElementById(fields[0]).innerHTML  = fields[1];
-		        } else if(fields[2] == "chk") {
-				    document.getElementById(fields[0]).checked  = fields[1];
-		        }
+                fields = entry.split("|");
+                if (fields[2] == "input") {
+                    document.getElementById(fields[0]).value = fields[1];
+                } else if (fields[2] == "select") {
+                    select = document.getElementById(fields[0]);
+                    options = Array.from(select.options);
+                    optionToSelect = options.find(item => item.text === fields[1]);
+                    if (optionToSelect)
+                        optionToSelect.selected = true;
+                } else if (fields[2] == "div") {
+                    document.getElementById(fields[0]).innerHTML = fields[1];
+                } else if (fields[2] == "span") {
+                    document.getElementById(fields[0]).innerHTML = fields[1];
+                } else if (fields[2] == "chk") {
+                    document.getElementById(fields[0]).checked = fields[1];
+                }
             }
         );
-	});
+    });
 }

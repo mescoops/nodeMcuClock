@@ -1,6 +1,6 @@
 {
-   "tz" : -800,
-   "dst" : 0,
+   "tz": "PST8PDT,M3.2.0,M11.1.0",
+   "tzn" : "America/Los_Angeles",
    "mode" : "2",
    "mute" : 0,
    "mute_start" : 230,
