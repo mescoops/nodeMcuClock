@@ -5,6 +5,7 @@
 #include "Ring.h"
 #include "Actuator.h"
 #include "Pin.h"
+#include "NetTime.h"
 
 
 Chime westminster = Chime::westminster();
@@ -44,7 +45,7 @@ Ring::Ring(Mute &m, Settings &s, RemoteDebug &d) : mute(m), settings(s), Debug(d
   for (int i=0; i<12; i++)
      logs[i] = "OK";
   logExtra = "Start";
-  logExtra2 = "Sec "+second();
+  logExtra2 = "Sec "+NetTime::sec();
 }
 
 void Ring::printdbg() {
@@ -68,7 +69,7 @@ void Ring::printdbgLog() {
   char s[100];
   //bool mut = instance->mute.dynMute!=0;
   sprintf(s, "[%d %lu %lu]", hourCount, mm, (mm-mmDevug));
-  int hh = hour();
+  int hh = NetTime::hour();
   if (hh>12) hh -= 12;
   if (hh==0) hh = 12;
   hh = hh-1;
@@ -107,8 +108,8 @@ String toString(Ring::QTR v) {
 }
 
 Ring::QTR Ring::calcQuarter() {
-  int mins = minute();
-  int secs = second();
+  int mins = NetTime::min();
+  int secs = NetTime::sec();
   QTR q = calcQuarter(mins==0, mins==30, mins==15, mins==45);
   logExtra2 = String(" Calc Qtr ")+toString(q)+"  "+mins+":"+secs;
   return q;
@@ -187,7 +188,7 @@ bool Ring::doRing() {
 
 void findShipRing() {
   //{A, A, PAUSE, A, A, PAUSE, A, A, PAUSE, A, A, END};
-  int h = hour();
+  int h = NetTime::hour();
   h = h % 4;
   // copy base list
   for (int i=0; i<12; i++)
@@ -242,7 +243,7 @@ void Ring::ding() {
     ringer.detach();
     // Check if we need to play hour, too
     if (instance->currQuarter==Ring::q_hr && instance->settings.clock_mode != CLOCK_SHIPS) {
-      int hh = hour();
+      int hh = NetTime::hour();
       if (hh>12) hh -= 12;
       if (hh==0) hh = 12;
       playHour(hh);

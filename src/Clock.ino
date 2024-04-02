@@ -60,7 +60,7 @@ void configModeCallback (WiFiManager *myWiFiManager) {
 
 // Check if we need to ring some bells
 void checkForRing() {
-  int secs = second();
+  int secs = NetTime::sec();
   ring.checkForRing();
   // if we are out of sync, reset clock
   if (secs>4) {
@@ -71,7 +71,7 @@ void checkForRing() {
 
 // line up ticker to 0th second
 void setupClockCheck() {
-  int secs = second();
+  int secs = NetTime::sec();
   if ((secs % 60)==0) {
     mainTicker.detach();
     // maybe we are at a quarter etc.
